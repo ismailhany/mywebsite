@@ -795,7 +795,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.disabled = true;
                 
                 // Submit form
-                fetch(this.dataset.endpoint, {
+                fetch(this.action, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
