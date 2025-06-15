@@ -69,7 +69,7 @@
                             data-price="<%= course.price === 0 ? 'free' : 'paid' %>" data-rating="<%= course.rating %>"
                             style="background:#fff; border-radius:18px; box-shadow:0 4px 18px rgba(0,0,0,0.08); overflow:hidden; transition:box-shadow 0.2s; display:flex; flex-direction:column; min-height:420px; position:relative;">
                             <div class="course-image" style="position:relative; width:100%; height:180px; overflow:hidden;">
-                                <img src="/<%= course.thumbnail %>" alt="<%= course.title %>" style="width:100%; height:100%; object-fit:cover; border-top-left-radius:18px; border-top-right-radius:18px; transition:transform 0.3s;">
+                                <img src="<%= course.thumbnail %>" alt="<%= course.title %>" style="width:100%; height:100%; object-fit:cover; border-top-left-radius:18px; border-top-right-radius:18px; transition:transform 0.3s;">
                                 <button class="like-btn" data-course-id="<%= course._id %>" style="position:absolute; top:10px; right:10px; background:transparent; border:none; cursor:pointer; z-index:2; font-size:1.6rem;">
                                     <i class="fa-heart <%= likedCourses && likedCourses.includes(course._id.toString()) ? 'fa-solid' : 'fa-regular' %>" style="<%= likedCourses && likedCourses.includes(course._id.toString()) ? 'color:red;' : '' %>"></i>
                                 </button>
@@ -159,12 +159,67 @@
 <script src="/script.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Liking Courses ---
     var liked = JSON.parse(localStorage.getItem('likedCourses') || '[]');
     fetch('/sync-liked-courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ likedCourses: liked })
     });
+
+    // --- Course Filtering ---
+    const searchInput = document.getElementById('search-input');
+    const categoryFilter = document.getElementById('category-filter');
+    const levelFilter = document.getElementById('level-filter');
+    const priceFilter = document.getElementById('price-filter');
+    const ratingFilter = document.getElementById('rating-filter');
+    const courseCards = document.querySelectorAll('.course-card');
+    const noCoursesMessage = document.querySelector('.no-courses');
+
+    function filterCourses() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const category = categoryFilter.value.toLowerCase();
+        const level = levelFilter.value.toLowerCase();
+        const price = priceFilter.value;
+        const minRating = parseFloat(ratingFilter.value);
+        
+        let visibleCourses = 0;
+
+        courseCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const cardCategory = card.dataset.category.toLowerCase();
+            const cardLevel = card.dataset.level.toLowerCase();
+            const cardPrice = card.dataset.price;
+            const cardRating = parseFloat(card.dataset.rating);
+
+            const searchMatch = !searchTerm || title.includes(searchTerm);
+            const categoryMatch = !category || cardCategory === category;
+            const levelMatch = !level || cardLevel === level;
+            const priceMatch = !price || cardPrice === price;
+            const ratingMatch = !minRating || cardRating >= minRating;
+
+            if (searchMatch && categoryMatch && levelMatch && priceMatch && ratingMatch) {
+                card.style.display = 'flex';
+                visibleCourses++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (noCoursesMessage) {
+            noCoursesMessage.style.display = visibleCourses === 0 ? 'block' : 'none';
+        }
+    }
+
+    [searchInput, categoryFilter, levelFilter, priceFilter, ratingFilter].forEach(element => {
+        element.addEventListener('change', filterCourses);
+        if (element.tagName === 'INPUT') {
+            element.addEventListener('keyup', filterCourses);
+        }
+    });
+
+    // Initial filter on page load in case of saved form values
+    filterCourses();
 });
 </script>
 </body>

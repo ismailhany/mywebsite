@@ -13,106 +13,108 @@
 <%- include('partials/sidebar') %>
 
 <div class="page-content">
-    <section class="about">
-        <div class="row">
-            <h3 style="margin-top: 20px;text-align: center;">About LearnHub</h3>
-            <div class="image">
-                <img src="/images/about-img.svg" alt="about illustration"
-                    style="width: 30%;height: 30%;display: block;margin: auto;">
+    <section class="about" style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
+        <h1 class="heading" style="text-align:center; margin-bottom:2rem;">About Us</h1>
+        
+        <div class="row" style="display: flex; flex-wrap: wrap; gap: 2rem; margin-bottom: 3rem;">
+            <div class="image" style="flex:1; min-width:300px;">
+                <img src="/images/about-img.svg" alt="about illustration" style="max-width:100%; height:auto;">
             </div>
-            <div class="content">
-                <h3>why choose us?</h3>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab quibusdam officia magni ea dolorum
-                    repellat assumenda dignissimos ipsum magnam unde!</p>
-                <a href="/courses" class="inline-btn">our courses</a>
+            <div class="content" style="flex:1; min-width:300px;">
+                <h3 style="margin-bottom:1rem;">Why Choose Us?</h3>
+                <p style="margin-bottom:1rem; line-height:1.6;">We are dedicated to providing the best learning experience for our students. Our platform offers a wide range of courses taught by experienced instructors.</p>
+                <div class="icons" style="display:flex; flex-wrap:wrap; gap:1rem;">
+                    <div class="icon" style="flex:1; min-width:200px; background:#fff; padding:1rem; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                        <i class="fas fa-graduation-cap" style="font-size:2rem; color:#4a90e2;"></i>
+                        <h3 style="margin:0.5rem 0;">10+</h3>
+                        <p style="margin:0;">Courses</p>
+                    </div>
+                    <div class="icon" style="flex:1; min-width:200px; background:#fff; padding:1rem; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                        <i class="fas fa-user-graduate" style="font-size:2rem; color:#4a90e2;"></i>
+                        <h3 style="margin:0.5rem 0;">1000+</h3>
+                        <p style="margin:0;">Students</p>
+                    </div>
+                    <div class="icon" style="flex:1; min-width:200px; background:#fff; padding:1rem; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                        <i class="fas fa-chalkboard-teacher" style="font-size:2rem; color:#4a90e2;"></i>
+                        <h3 style="margin:0.5rem 0;">20+</h3>
+                        <p style="margin:0;">Teachers</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="box-container">
-            <div class="box">
-                <i class="fas fa-graduation-cap"></i>
-                <div>
-                    <h3>+10k</h3>
-                    <span>online courses</span>
+        <!-- Reviews Section -->
+        <div class="reviews-section" style="margin-top: 4rem;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">What Our Students Say</h2>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger" style="background-color: #fee2e2; color: #dc2626; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;">
+                    <%= error %>
                 </div>
-            </div>
-
-            <div class="box">
-                <i class="fas fa-user-graduate"></i>
-                <div>
-                    <h3>+20k</h3>
-                    <span>brilliant student</span>
+            <% } %>
+            
+            <% if (typeof success !== 'undefined' && success) { %>
+                <div class="alert alert-success" style="background-color: #dcfce7; color: #16a34a; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;">
+                    <%= success %>
                 </div>
-            </div>
+            <% } %>
 
-            <div class="box">
-                <i class="fas fa-chalkboard-user"></i>
-                <div>
-                    <h3>+2k</h3>
-                    <span>expert teachers</span>
-                </div>
-            </div>
-
-            <div class="box">
-                <i class="fas fa-briefcase"></i>
-                <div>
-                    <h3>100%</h3>
-                    <span>job placement</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="reviews">
-        <h1 class="heading">students reviews</h1>
-        <div class="box-container">
-            <div class="box">
-                <p>"This platform made learning so easy and fun! The teachers are very supportive and the content is top-notch."</p>
-                <div class="user">
-                    <img src="/images/pic-2.jpg" alt="student review">
-                    <div>
-                        <h3>Sarah Ahmed</h3>
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
+            <!-- Review Form -->
+            <% if (user) { %>
+                <div class="review-form" style="max-width: 600px; margin: 0 auto 3rem; background: #fff; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.07);">
+                    <h3 style="margin-bottom: 1rem; text-align: center;">Share Your Experience</h3>
+                    <form action="/about/review" method="post">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem;">Rating</label>
+                            <div class="rating" style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                <% for(let i = 1; i <= 5; i++) { %>
+                                    <label style="cursor: pointer;">
+                                        <input type="radio" name="rating" value="<%= i %>" required style="display: none;">
+                                        <i class="fas fa-star" style="font-size: 1.5rem; color: #ddd;"></i>
+                                    </label>
+                                <% } %>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="box">
-                <p>"I improved my skills and landed a new job thanks to the amazing courses and instructors here!"</p>
-                <div class="user">
-                    <img src="/images/pic-3.jpg" alt="student review">
-                    <div>
-                        <h3>Mohamed Ali</h3>
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem;">Your Review</label>
+                            <textarea name="comment" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.5rem; min-height: 100px;"></textarea>
                         </div>
-                    </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Review</button>
+                    </form>
                 </div>
-            </div>
-            <div class="box">
-                <p>"Great experience! The lessons are clear and the community is very helpful. Highly recommended."</p>
-                <div class="user">
-                    <img src="/images/pic-4.jpg" alt="student review">
-                    <div>
-                        <h3>Lina Hassan</h3>
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
+            <% } else { %>
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <p>Please <a href="/login" style="color: #4a90e2; text-decoration: none;">login</a> to leave a review.</p>
+                </div>
+            <% } %>
+
+            <!-- Reviews List -->
+            <div class="reviews-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <% if (reviews && reviews.length > 0) { %>
+                    <% reviews.forEach(review => { %>
+                        <div class="review-card" style="background: #fff; padding: 1.5rem; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                <img src="<%= review.user.profilePicture || '/images/default-avatar.png' %>" alt="<%= review.user.firstName %>" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 1rem;">
+                                <div>
+                                    <h4 style="margin: 0;"><%= review.user.firstName %> <%= review.user.lastName %></h4>
+                                    <div class="stars" style="color: #ffd700;">
+                                        <% for(let i = 1; i <= 5; i++) { %>
+                                            <i class="fas fa-star<%= i <= review.rating ? '' : '-o' %>"></i>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <p style="margin: 0; line-height: 1.6;"><%= review.comment %></p>
+                            <p style="margin: 0.5rem 0 0; font-size: 0.9rem; color: #666;">
+                                <%= new Date(review.createdAt).toLocaleDateString() %>
+                            </p>
                         </div>
+                    <% }); %>
+                <% } else { %>
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                        <p>No reviews yet. Be the first to share your experience!</p>
                     </div>
-                </div>
+                <% } %>
             </div>
         </div>
     </section>
@@ -120,5 +122,28 @@
 
 <%- include('partials/footer') %>
 <script src="/script.js"></script>
+<script>
+    // Star rating interaction
+    document.querySelectorAll('.rating label').forEach((label, index) => {
+        label.addEventListener('mouseover', () => {
+            for(let i = 0; i <= index; i++) {
+                document.querySelectorAll('.rating i')[i].style.color = '#ffd700';
+            }
+        });
+        
+        label.addEventListener('mouseout', () => {
+            const selectedRating = document.querySelector('input[name="rating"]:checked')?.value || 0;
+            document.querySelectorAll('.rating i').forEach((star, i) => {
+                star.style.color = i < selectedRating ? '#ffd700' : '#ddd';
+            });
+        });
+        
+        label.addEventListener('click', () => {
+            document.querySelectorAll('.rating i').forEach((star, i) => {
+                star.style.color = i <= index ? '#ffd700' : '#ddd';
+            });
+        });
+    });
+</script>
 </body>
 </html>

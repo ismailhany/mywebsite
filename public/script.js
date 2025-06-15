@@ -1,3 +1,43 @@
+// --- THEME MANAGER (DARK/LIGHT MODE) ---
+// This script is self-contained and runs immediately to prevent theme flashing.
+(function() {
+    const themeToggleButton = document.getElementById('theme-toggle-btn');
+    const body = document.body;
+
+    // 1. Function to apply the correct theme class and icon
+    const applyTheme = (theme) => {
+        body.classList.remove('light', 'dark');
+        body.classList.add(theme);
+        
+        if (themeToggleButton) {
+            const icon = themeToggleButton.querySelector('i');
+            if (theme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+        // Save the user's preference
+        localStorage.setItem('theme', theme);
+    };
+
+    // 2. Set the initial theme on page load
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+
+    // 3. Add click listener to the button
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener('click', () => {
+            const newTheme = body.classList.contains('dark') ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+    }
+})();
+
+
+// --- MAIN SCRIPT ---
 console.log('script.js loaded!');
 // DOM Elements
 const body = document.body;
@@ -835,41 +875,6 @@ function showNotification(type, message) {
     }, 5000);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Apply dark mode on page load if enabled
-    if (localStorage.getItem('dark-mode') === 'enabled') {
-        document.body.classList.add('dark');
-    } else {
-        document.body.classList.remove('dark');
-    }
-    // Dark mode button logic
-    const globalDarkModeBtn = document.getElementById('globalDarkModeBtn');
-    if (globalDarkModeBtn) {
-        const icon = globalDarkModeBtn.querySelector('i');
-        function updateIcon() {
-            if (document.body.classList.contains('dark')) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                globalDarkModeBtn.title = 'Switch to light mode';
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                globalDarkModeBtn.title = 'Switch to dark mode';
-            }
-        }
-        updateIcon();
-        globalDarkModeBtn.addEventListener('click', function() {
-            document.body.classList.toggle('dark');
-            if (document.body.classList.contains('dark')) {
-                localStorage.setItem('dark-mode', 'enabled');
-            } else {
-                localStorage.setItem('dark-mode', 'disabled');
-            }
-            updateIcon();
-        });
-    }
-});
-
 // === COURSE FILTERS & SEARCH FOR COURSES PAGE ===
 // Only run this block if we are on the courses page
 if (document.querySelector('.courses-container') && document.querySelector('.course-card')) {
@@ -966,46 +971,3 @@ document.addEventListener('click', function(e) {
 });
 
 document.addEventListener('DOMContentLoaded', updateLikeButtons);
-
-// === DARK MODE TOGGLE ===
-function applyDarkModeSetting() {
-    if (localStorage.getItem('dark-mode') === 'enabled') {
-        document.body.classList.add('dark');
-    } else {
-        document.body.classList.remove('dark');
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Add dark mode button to header if not present
-    if (!document.getElementById('globalDarkModeBtn')) {
-        var btn = document.createElement('button');
-        btn.id = 'globalDarkModeBtn';
-        btn.title = 'Toggle dark mode';
-        btn.style = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#222;color:#fff;border:none;border-radius:50%;width:48px;height:48px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;';
-        btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
-        document.body.appendChild(btn);
-    }
-    applyDarkModeSetting();
-    var darkBtn = document.getElementById('globalDarkModeBtn');
-    if (darkBtn) {
-        darkBtn.addEventListener('click', function() {
-            if (document.body.classList.contains('dark')) {
-                document.body.classList.remove('dark');
-                localStorage.setItem('dark-mode', 'disabled');
-            } else {
-                document.body.classList.add('dark');
-                localStorage.setItem('dark-mode', 'enabled');
-            }
-            // Change icon
-            var icon = darkBtn.querySelector('i');
-            if (document.body.classList.contains('dark')) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            }
-        });
-    }
-});

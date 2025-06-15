@@ -1,5 +1,5 @@
 // This is a dummy line to force module re-evaluation.
-const { User, Course, Enrollment, Lesson, Playlist, Video, Comment } = require('../models/schema');
+const { User, Course, Enrollment, Lesson, Playlist, Video, Comment, Review } = require('../models/schema');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -32,9 +32,18 @@ exports.home = async (req, res) => {
 // About page (static)
 exports.about = async (req, res) => {
   try {
-    const reviews = [];
+    const reviews = await Review.find()
+      .populate('user', 'firstName lastName profilePicture')
+      .sort('-createdAt');
     const title = "About";
-    res.render('about', { title, reviews, user: req.session.user, path: req.path });
+    res.render('about', { 
+      title, 
+      reviews, 
+      user: req.session.user, 
+      path: req.path,
+      error: req.query.error,
+      success: req.query.success
+    });
   } catch (err) {
     console.error('About page error:', err);
     res.status(500).render('error', {
@@ -49,22 +58,16 @@ exports.about = async (req, res) => {
 // All published courses
 exports.getCourses = async (req, res) => {
   try {
-    const limit = 12; // Increased limit for better display
+    const limit = 2;
     const currentPage = parseInt(req.query.page) || 1;
     const skip = (currentPage - 1) * limit;
-    
-    // Get all published courses with pagination
-    const [courses, coursesCount] = await Promise.all([
-      Course.find({ isPublished: true })
-        .populate('instructor', 'firstName lastName email')
-        .sort('-createdAt')
-        .skip(skip)
-        .limit(limit),
-      Course.countDocuments({ isPublished: true })
-    ]);
+    const coursesCount = await Course.countDocuments({ isPublished: true });
+    const courses = await Course.find({ isPublished: true }).skip(skip).limit(limit)
+      .populate('instructor', 'firstName lastName email')
+      .sort('-createdAt');
 
     const totalPages = Math.ceil(coursesCount / limit);
-
+    console.log("totalPages", totalPages);
     res.render('courses', {
       title: 'Browse Courses',
       courses,
@@ -132,7 +135,7 @@ exports.enrollCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id)
       .populate('instructor', 'firstName lastName email')
-      .populate({ path: 'lessons', populate: { path: 'videos' } }); // Populate lessons and their videos/content
+      .populate({ path: 'lessons', populate: { path: 'videos' } });
     if (!course) {
       return res.status(404).render('404', {
         title: 'Course Not Found',
@@ -166,9 +169,7 @@ exports.enrollCourse = async (req, res) => {
       user: req.session.user,
       path: req.path
     });
-  }
-
-  catch (err) {
+  } catch (err) {
     console.error('enroll course error:', err);
     res.status(500).render('error', {
       title: 'Error',
@@ -208,51 +209,23 @@ exports.createCourseGet = (req, res) => {
 // Create a new course (teacher only) - POST to handle submission
 exports.createCourse = async (req, res) => {
   try {
-    if (!req.session.user || req.session.user.role !== 'teacher') {
-      return res.status(403).render('error', {
-        title: 'Unauthorized',
-        message: 'Only teachers can create courses.',
-        path: req.path
-      });
-    }
-
-    // Parse requirements and whatYouWillLearn arrays
-    const requirements = req.body.requirements ? 
-      req.body.requirements.split(',').map(s => s.trim()).filter(s => s) : [];
-    
-    const whatYouWillLearn = req.body.whatYouWillLearn ? 
-      req.body.whatYouWillLearn.split(',').map(s => s.trim()).filter(s => s) : [];
-
-    // Create course with only the fields defined in the schema
+    // Reverted to secure method: using the logged-in user's session
     const course = new Course({
       title: req.body.title,
       description: req.body.description,
-      shortDescription: req.body.shortDescription,
       instructor: req.session.user._id,
+      thumbnail: req.file ? `/uploads/courses/thumbnails/${req.file.filename}` : undefined,
       category: req.body.category,
       level: req.body.level,
-      price: parseFloat(req.body.price) || 0,
+      price: req.body.price,
+      shortDescription: req.body.shortDescription,
       duration: req.body.duration,
-      thumbnail: req.file ? `/uploads/courses/thumbnails/${req.file.filename}` : '/uploads/courses/thumbnails/default-course.jpg',
-      requirements: requirements,
-      whatYouWillLearn: whatYouWillLearn,
-      isPublished: true, // Set to true to make it visible immediately
-      enrollmentCount: 0,
-      averageRating: 0,
-      totalRatings: 0,
-      students: 0
+      requirements: req.body.requirements ? req.body.requirements.split(',').map(s => s.trim()) : [],
+      whatYouWillLearn: req.body.whatYouWillLearn ? req.body.whatYouWillLearn.split(',').map(s => s.trim()) : [],
+      isPublished: true
     });
-
     await course.save();
-
-    // Add course to instructor's created courses
-    const User = require('../models/User');
-    await User.findByIdAndUpdate(req.session.user._id, {
-      $push: { createdCourses: course._id }
-    });
-
-    // Redirect to the course detail page
-    res.redirect(`/courses/${course._id}`);
+    res.redirect('/courses');
   } catch (err) {
     console.error('Create course error:', err);
     res.status(500).render('error', {
@@ -260,6 +233,99 @@ exports.createCourse = async (req, res) => {
       message: 'Oops! Couldn\'t create the course.',
       error: process.env.NODE_ENV === 'development' ? err : {},
       path: req.path
+    });
+  }
+};
+
+// Manage a course (teacher only) - GET to show management dashboard
+exports.manageCourseGet = async (req, res) => {
+  try {
+    const course = await Course.findOne({
+      _id: req.params.id,
+      instructor: req.session.user._id
+    }).populate('lessons');
+
+    if (!course) {
+      return res.status(404).render('404', {
+        title: 'Course Not Found',
+        message: 'You are not the instructor of this course or it does not exist.',
+        path: req.path,
+        user: req.session.user
+      });
+    }
+
+    const studentCount = await Enrollment.countDocuments({ course: req.params.id });
+
+    res.render('manage-course', {
+      title: `Manage: ${course.title}`,
+      course,
+      studentCount,
+      user: req.session.user,
+      path: req.path
+    });
+  } catch (err) {
+    console.error('Manage course page error:', err);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Oops! Could not load the course management page.',
+      error: process.env.NODE_ENV === 'development' ? err : {},
+      path: req.path,
+      user: req.session.user
+    });
+  }
+};
+
+// Handle course details update from manage page
+exports.updateCourseDetails = async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    await Course.findOneAndUpdate(
+      { _id: req.params.id, instructor: req.session.user._id },
+      { title, description, lastUpdated: Date.now() },
+      { new: true, runValidators: true }
+    );
+    res.redirect(`/courses/${req.params.id}/manage`);
+  } catch (err) {
+    console.error('Update course details error:', err);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Oops! Could not update the course details.',
+      error: process.env.NODE_ENV === 'development' ? err : {},
+      path: req.path,
+      user: req.session.user
+    });
+  }
+};
+
+// Handle adding a new lesson from manage page
+exports.addLessonToCourse = async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const course = await Course.findOne({ _id: req.params.id, instructor: req.session.user._id });
+
+    if (!course) {
+      return res.status(404).send('Course not found or you are not the instructor.');
+    }
+
+    const lesson = new Lesson({
+      title,
+      description,
+      course: course._id
+    });
+    await lesson.save();
+
+    course.lessons.push(lesson._id);
+    await course.save();
+
+    res.redirect(`/courses/${req.params.id}/manage`);
+  } catch (err) {
+    console.error('Add lesson error:', err);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Oops! Could not add the new lesson.',
+      error: process.env.NODE_ENV === 'development' ? err : {},
+      path: req.path,
+      user: req.session.user
     });
   }
 };
@@ -305,44 +371,32 @@ exports.updateCourseGet = async (req, res) => {
 // Update a course (teacher only) - POST to handle submission
 exports.updateCourse = async (req, res) => {
   try {
-    if (!req.session.user || req.session.user.role !== 'teacher') {
-      return res.status(403).render('error', {
-        title: 'Unauthorized',
-        message: 'Only teachers can update courses.',
-        path: req.path
-      });
+    const { title, description, price, videoUrl } = req.body;
+    const courseId = req.params.id;
+
+    // Validate input
+    if (!title || !description || !price) {
+      return res.status(400).json({ message: 'All fields are required' });
     }
-    const course = await Course.findOne({
-      _id: req.params.id,
-      instructor: req.session.user._id
-    });
+
+    // Check if course exists and belongs to the teacher
+    const course = await Course.findOne({ _id: courseId, instructor: req.session.user._id });
     if (!course) {
-      return res.status(404).render('404', {
-        title: 'Course Not Found',
-        message: 'You do not have permission to edit this course.',
-        path: req.path
-      });
+      return res.status(404).json({ message: 'Course not found or unauthorized' });
     }
-    course.title = req.body.title;
-    course.description = req.body.description;
-    if (req.file) course.thumbnail = `/uploads/thumbnails/${req.file.filename}`; // Correct path
-    course.category = req.body.category;
-    course.level = req.body.level;
-    course.price = req.body.price;
-    course.shortDescription = req.body.shortDescription;
-    course.duration = req.body.duration;
-    course.requirements = req.body.requirements ? req.body.requirements.split(',').map(s => s.trim()) : [];
-    course.whatYouWillLearn = req.body.whatYouWillLearn ? req.body.whatYouWillLearn.split(',').map(s => s.trim()) : [];
+
+    // Update course
+    course.title = title;
+    course.description = description;
+    course.price = price;
+    course.videoUrl = videoUrl;
+
     await course.save();
-    res.redirect(`/courses/${req.params.id}`);
-  } catch (err) {
-    console.error('Update course error:', err);
-    res.status(500).render('error', {
-      title: 'Error',
-      message: 'Oops! Couldn\'t update the course.',
-      error: process.env.NODE_ENV === 'development' ? err : {},
-      path: req.path
-    });
+
+    res.json({ message: 'Course updated successfully', course });
+  } catch (error) {
+    console.error('Error updating course:', error);
+    res.status(500).json({ message: 'Error updating course' });
   }
 };
 
@@ -803,7 +857,6 @@ exports.profile = async (req, res) => {
       likedVideos: user.likedVideos || 0,
     };
 
-
     res.render('profile', { title: 'My Profile', user: userDTO, path: req.path });
   } catch (err) {
     console.error('Profile error:', err);
@@ -898,7 +951,8 @@ exports.loginGet = (req, res) => {
       title: 'Error',
       message: 'Oops! Couldn\'t load the login page.',
       error: process.env.NODE_ENV === 'development' ? err : {},
-      path: req.path
+      path: req.path,
+      user: req.session.user || null
     });
   }
 };
@@ -906,27 +960,52 @@ exports.loginGet = (req, res) => {
 exports.loginPost = async (req, res) => {
   try {
     const { email, password, remember } = req.body;
-    console.log('Login attempt:', { email, password }); // Log login attempt
-    const user = await User.findOne({ email }).select('+password').exec();
-    if (user && await bcrypt.compare(password, user.password)) {
-      req.session.user = {
-        _id: user._id,
-        fullName: user.firstName + ' ' + user.lastName,
-        email: user.email,
-        role: user.role,
-        profilePicture: user.profilePicture,
-      };
-
-      if (remember) {
-        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
-      }
-
-      return res.redirect('/profile');
+    console.log('Login attempt:', { email, password });
+    if (!email || !password) {
+      console.log('Missing email or password');
+      return res.status(400).render('login', {
+        title: 'Login',
+        error: 'Email and password are required.',
+        user: null,
+        path: req.path
+      });
     }
-    res.status(401).json({ success: false, message: 'Oops! Invalid email or password.' });
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password').exec();
+    console.log('User found:', user ? user.email : 'No user');
+    if (user) {
+      console.log('Stored hash:', user.password);
+      const match = await bcrypt.compare(password, user.password);
+      console.log('Password match:', match);
+      if (match) {
+        req.session.user = {
+          _id: user._id,
+          fullName: user.firstName + ' ' + user.lastName,
+          email: user.email,
+          role: user.role,
+          profilePicture: user.profilePicture,
+        };
+        if (remember) {
+          req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+        }
+        return res.redirect('/profile');
+      }
+    }
+    console.log('Invalid credentials');
+    return res.status(401).render('login', {
+      title: 'Login',
+      error: 'Oops! Invalid email or password.',
+      user: null,
+      path: req.path
+    });
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ success: false, message: 'Oops! Something went wrong during login.' });
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Oops! Something went wrong during login.',
+      error: process.env.NODE_ENV === 'development' ? err : {},
+      path: req.path,
+      user: req.session.user || null
+    });
   }
 };
 
@@ -945,42 +1024,46 @@ exports.registerGet = (req, res) => {
 };
 
 exports.registerPost = async (req, res) => {
-  try {
-    const { name, email, password, confirm_password, role } = req.body;
-    console.log('Registration attempt:', { name, email, role }); // Log registration attempt
+  const { name, email, password, confirm_password, role } = req.body;
+  const values = { name, email, role }; // Store original input
 
+  try {
     let profilePicture = null;
-    if(req.files && req.files.length > 0){
-        profilePicture = `/uploads/${req.files[0].filename}`
+    if (req.file) {
+      profilePicture = `/uploads/profiles/${req.file.filename}`;
     }
 
     if (password !== confirm_password) {
-      return res.status(400).json({ success: false, message: 'Hmm, passwords don\'t match. Try again!' });
+      return res.status(400).render('register', {
+        title: 'Register',
+        error: "Hmm, passwords don't match. Try again!",
+        values,
+        path: req.path
+      });
     }
 
-    if (await User.findOne({ email }).exec()) {
-      return res.status(409).json({ success: false, message: 'This email is already taken.' });
+    if (await User.findOne({ email: email.toLowerCase() }).exec()) {
+      return res.status(409).render('register', {
+        title: 'Register',
+        error: 'This email is already registered. Try logging in.',
+        values,
+        path: req.path
+      });
     }
 
-    const [firstName, ...lastName] = name.split(' ');
-    const usernameBase = email.split('@')[0];
-    const uniqueUsername = `${usernameBase}-${Date.now()}`.toLowerCase();
-
+    const emailLower = email.toLowerCase();
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const [firstName, ...lastName] = name.split(' ');
 
     const newUser = new User({
-      username: uniqueUsername,
-      email,
+      email: emailLower,
       password: hashedPassword,
       role: role || 'student',
       firstName,
       lastName: lastName.join(' '),
-      bio: '',
       profilePicture
     });
-
-    console.log('Attempting to save user:', { username: newUser.username, email: newUser.email, role: newUser.role }); // Log user creation attempt
 
     await newUser.save();
 
@@ -992,22 +1075,20 @@ exports.registerPost = async (req, res) => {
       profilePicture: newUser.profilePicture,
     };
 
-    return res.redirect('/');
+    return res.redirect('/profile'); // Redirect to profile on success
 
   } catch (err) {
-    console.error('Registration error details:', err); // Log detailed error
+    console.error('Registration error details:', err);
+    let errorMessage = 'Oops! Something went wrong during registration.';
     if (err.name === 'ValidationError') {
-      const errors = Object.values(err.errors).map(error => error.message);
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Validation error', 
-        errors: errors 
-      });
+      errorMessage = Object.values(err.errors).map(error => error.message).join(' ');
     }
-    res.status(500).json({ 
-      success: false, 
-      message: 'Oops! Something went wrong during registration.',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    
+    res.status(500).render('register', {
+        title: 'Register',
+        error: errorMessage,
+        values,
+        path: req.path
     });
   }
 };
@@ -1027,13 +1108,66 @@ exports.contactGet = (req, res) => {
 
 exports.contactPost = (req, res) => {
   try {
-    // In a real application, you'd send an email here or save to a DB
-    res.render('contact', { title: 'Contact Us', user: req.session.user, success: 'Thanks! Your message was sent successfully.', contactInfo: {}, path: req.path });
+    const { name, email, number, msg } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !number || !msg) {
+      return res.status(400).render('contact', {
+        title: 'Contact Us',
+        user: req.session.user,
+        error: 'All fields are required',
+        contactInfo: req.body,
+        path: req.path
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).render('contact', {
+        title: 'Contact Us',
+        user: req.session.user,
+        error: 'Please enter a valid email address',
+        contactInfo: req.body,
+        path: req.path
+      });
+    }
+
+    // Validate phone number (basic validation)
+    const phoneRegex = /^\d{10,15}$/;
+    if (!phoneRegex.test(number.replace(/\D/g, ''))) {
+      return res.status(400).render('contact', {
+        title: 'Contact Us',
+        user: req.session.user,
+        error: 'Please enter a valid phone number (10-15 digits)',
+        contactInfo: req.body,
+        path: req.path
+      });
+    }
+
+    // Log the contact message (in a real app, this would send an email)
+    console.log('Contact form submission:', {
+      name,
+      email,
+      number,
+      message: msg,
+      timestamp: new Date().toISOString()
+    });
+
+    // Render success message
+    res.render('contact', {
+      title: 'Contact Us',
+      user: req.session.user,
+      success: 'Thank you for your message! We will get back to you soon.',
+      path: req.path
+    });
   } catch (err) {
     console.error('Contact post error:', err);
-    res.status(500).render('error', {
-      message: 'Oops! Couldn\'t send your message.',
-      error: process.env.NODE_ENV === 'development' ? err : {},
+    res.status(500).render('contact', {
+      title: 'Contact Us',
+      user: req.session.user,
+      error: 'Oops! Something went wrong. Please try again later.',
+      contactInfo: req.body,
       path: req.path
     });
   }
@@ -1082,7 +1216,14 @@ exports.dashboard = async (req, res) => {
 // Settings page controller
 exports.settings = (req, res) => {
   if (!req.session.user) return res.redirect('/login');
-  res.render('settings', { title: 'Settings', user: req.session.user, path: req.path });
+  const message = req.session.message;
+  req.session.message = null; // Clear the message after retrieving it
+  res.render('settings', {
+    title: 'Settings',
+    user: req.session.user,
+    path: req.path,
+    message: message
+  });
 };
 
 // Help Center page controller
@@ -1093,31 +1234,21 @@ exports.help = (req, res) => {
 // Update profile picture
 exports.updateProfilePicture = async (req, res) => {
   try {
-    if (!req.session.user) return res.redirect('/login');
-    
     const user = await User.findById(req.session.user._id);
-    if (!user) {
-      return res.status(404).render('error', {
-        title: 'User Not Found',
-        message: 'User not found.',
-        path: req.path
-      });
-    }
-
-    if(req.files && req.files.length > 0){
-        user.profilePicture = `/uploads/${req.files[0].filename}`;
-        await user.save();
-      // Update session
+    if (req.file) {
+      // CONSTRUCT THE CORRECT, WEB-ACCESSIBLE PATH
+      const profilePicturePath = `/uploads/profiles/${req.file.filename}`;
+      user.profilePicture = profilePicturePath;
+      await user.save();
+      // Update the session to reflect the change immediately
       req.session.user.profilePicture = user.profilePicture;
     }
-    
-
     res.redirect('/settings');
   } catch (err) {
-    console.error('Profile picture update error:', err);
+    console.error('Update profile picture error:', err);
     res.status(500).render('error', {
       title: 'Error',
-      message: 'Could not update profile picture.',
+      message: 'Oops! Couldn\'t update your profile picture.',
       error: process.env.NODE_ENV === 'development' ? err : {},
       path: req.path
     });
@@ -1455,4 +1586,177 @@ exports.likedCoursesPage = async (req, res) => {
       path: req.path
     });
   }
+};
+
+// Get all courses for the logged-in teacher
+exports.getTeacherCourses = async (req, res) => {
+  try {
+    console.log(`Fetching courses for teacher ID: ${req.session.user._id}`);
+    const teacherCourses = await Course.find({ instructor: req.session.user._id })
+      .sort({ createdAt: -1 });
+    console.log(`Found ${teacherCourses.length} courses.`);
+
+    res.render('teacher-courses', {
+      title: 'My Courses',
+      courses: teacherCourses,
+      user: req.session.user,
+      path: req.path
+    });
+  } catch (err) {
+    console.error('Get teacher courses error:', err);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Could not load your courses.',
+      error: process.env.NODE_ENV === 'development' ? err : {},
+      path: req.path
+    });
+  }
+};
+
+exports.updatePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        console.log('Current Password Input:', currentPassword);
+
+        const user = await User.findById(req.session.user._id);
+
+        if (!user) {
+            req.session.message = { type: 'error', text: 'User not found.' };
+            return res.redirect('/settings');
+        }
+
+        console.log('User found:', user.email);
+        console.log('Stored Password Hash:', user.password);
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        console.log('Password match result:', isMatch);
+
+        if (!isMatch) {
+            req.session.message = { type: 'error', text: 'Incorrect current password.' };
+            return res.redirect('/settings');
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        user.password = hashedPassword;
+        await user.save();
+
+        req.session.message = { type: 'success', text: 'Password updated successfully.' };
+        res.redirect('/settings');
+    } catch (err) {
+        console.error('Update password error:', err);
+        req.session.message = { type: 'error', text: 'Failed to update password.' };
+        res.redirect('/settings');
+    }
+};
+
+// Add review
+exports.addReview = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect('/login');
+    }
+
+    const { rating, comment } = req.body;
+
+    // Validate input
+    if (!rating || !comment) {
+      return res.redirect('/about?error=Please provide both rating and comment');
+    }
+
+    const ratingNum = parseInt(rating);
+    if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+      return res.redirect('/about?error=Rating must be between 1 and 5');
+    }
+
+    // Create new review
+    const review = new Review({
+      user: req.session.user._id,
+      rating: ratingNum,
+      comment: comment.trim()
+    });
+
+    await review.save();
+
+    res.redirect('/about?success=Thank you for your review!');
+  } catch (err) {
+    console.error('Add review error:', err);
+    res.redirect('/about?error=Failed to add review. Please try again.');
+  }
+};
+
+exports.register = async (req, res) => {
+    try {
+        const { name, email, password, role } = req.body;
+
+        // Validate input
+        if (!name || !email || !password || !role) {
+            return res.status(400).render('register', {
+                title: 'Register',
+                error: 'All fields are required',
+                values: req.body
+            });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).render('register', {
+                title: 'Register',
+                error: 'Email already registered',
+                values: req.body
+            });
+        }
+
+        // Validate role
+        const validRoles = ['student', 'teacher', 'admin'];
+        if (!validRoles.includes(role)) {
+            return res.status(400).render('register', {
+                title: 'Register',
+                error: 'Invalid role selected',
+                values: req.body
+            });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user
+        const user = new User({
+            name,
+            email,
+            password: hashedPassword,
+            role
+        });
+
+        await user.save();
+
+        // Set user session
+        req.session.user = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        };
+
+        // Redirect based on role
+        switch (role) {
+            case 'admin':
+                res.redirect('/admin/dashboard');
+                break;
+            case 'teacher':
+                res.redirect('/teacher/dashboard');
+                break;
+            default:
+                res.redirect('/student/dashboard');
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).render('register', {
+            title: 'Register',
+            error: 'Error during registration',
+            values: req.body
+        });
+    }
 };

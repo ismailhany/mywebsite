@@ -13,6 +13,13 @@
 <div class="page-content">
     <section class="settings">
         <h1 class="heading">Account Settings</h1>
+
+        <% if (message) { %>
+            <div class="alert alert-<%= message.type %>" style="margin-bottom: 1rem; padding: 1rem; border-radius: .5rem; color: #fff; background-color: <%= message.type === 'success' ? '#28a745' : '#dc3545' %>;">
+                <%= message.text %>
+            </div>
+        <% } %>
+
         <div class="settings-container" style="max-width: 600px; margin: auto;">
             <!-- Profile Picture Update -->
             <form action="/update-profile-picture" method="post" enctype="multipart/form-data" class="form-group" style="margin-bottom: 2rem;">

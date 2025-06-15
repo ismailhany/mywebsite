@@ -16,22 +16,20 @@
             <div class="page-content">
                 <section class="form-container">
                     <form action="/register" method="post" enctype="multipart/form-data" id="registerForm">
-                        <h3>register new</h3>
+                        <h3>Register New</h3>
 
-                        <!-- <div class="form-group">
-                        <label for="name">your nam</label>
-                        <div class="input-group">
-                            <i class="fas fa-envelope"></i>
-                            <input type="text" id="name" name="name" placeholder="enter your name" maxlength="100" required class="box">
-                        </div>
-                    </div> -->
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <div class="alert alert-danger" role="alert" style="background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; padding: .75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem;">
+                                <i class="fas fa-exclamation-triangle"></i> <%= error %>
+                            </div>
+                        <% } %>
 
                         <div class="form-group">
                             <label for="name">Your Name<span>*</span></label>
                             <div class="input-group">
                                 <i class="fas fa-user"></i>
                                 <input type="text" id="name" name="name" placeholder="enter your name" maxlength="100"
-                                    required class="box">
+                                    required class="box" value="<%= typeof values !== 'undefined' ? values.name : '' %>">
                             </div>
                         </div>
 
@@ -40,9 +38,10 @@
                             <div class="input-group">
                                 <i class="fas fa-user-tag"></i>
                                 <select name="role" id="role" required class="box">
-                                    <option value="">Select your role</option>
-                                    <option value="student">Student</option>
-                                    <option value="teacher">Teacher</option>
+                                    <option value="" <%= (typeof values === 'undefined' || !values.role) ? 'selected' : '' %>>Select your role</option>
+                                    <option value="student" <%= (typeof values !== 'undefined' && values.role === 'student') ? 'selected' : '' %>>Student</option>
+                                    <option value="teacher" <%= (typeof values !== 'undefined' && values.role === 'teacher') ? 'selected' : '' %>>Teacher</option>
+                                    <option value="admin" <%= (typeof values !== 'undefined' && values.role === 'admin') ? 'selected' : '' %>>Admin</option>
                                 </select>
                             </div>
                         </div>
@@ -52,7 +51,7 @@
                             <div class="input-group">
                                 <i class="fas fa-envelope"></i>
                                 <input type="email" name="email" placeholder="enter your email" maxlength="100" required
-                                    class="box">
+                                    class="box" value="<%= typeof values !== 'undefined' ? values.email : '' %>">
                             </div>
                         </div>
 

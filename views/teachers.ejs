@@ -12,39 +12,51 @@
 <%- include('partials/header') %>
 <%- include('partials/sidebar') %>
 
-<section class="teachers">
-    <h1 class="heading">expert tutors</h1>
-
-    <form action="/teachers" method="post" class="search-tutor" style="max-width:400px; margin:2rem auto; display:flex; align-items:center; background:#fff; border-radius:30px; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:0.5rem 1rem;">
-        <i class="fas fa-search" style="color:#aaa; font-size:1.1rem; margin-right:0.5rem;"></i>
-        <input type="text" name="search_box" maxlength="100" placeholder="Search tutor..." required style="border:none; outline:none; flex:1; font-size:1rem; background:transparent; padding:0.5rem 0;">
-        <button type="submit" name="search_tutor" class="btn btn-primary" style="border-radius:20px; margin-left:0.5rem; padding:0.5rem 1.2rem; font-size:1rem;">Search</button>
-    </form>
-    
-    <div class="box-container">
-        <div class="box offer">
-            <h3>become a tutor</h3>
-            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit Laborum, magnam!</p>
-            <a href="/register" class="inline-btn">get started</a>
-        </div>
-        
-        <% teachers.forEach(function(teacher) { %>
-        <div class="box">
-            <div class="tutor">
-                <img src="<%= teacher.profilePicture || '/images/default-avatar.png' %>" alt="tutor">
-                <div>
-                    <h3><%= teacher.name || (teacher.firstName + ' ' + teacher.lastName) %></h3>
-                    <span><%= teacher.role || 'Teacher' %></span>
-                </div>
+<div class="page-content" style="padding: 2rem;">
+    <section class="teachers-page">
+        <div class="container">
+            <div class="teachers-header text-center mb-5">
+                <h1 class="display-4 fw-bold">Our Instructors</h1>
+                <p class="lead text-muted">Learn from the best and brightest in the industry.</p>
             </div>
-            <p>playlists: <span><%= teacher.playlistsCount || 0 %></span></p>
-            <p>total videos: <span><%= teacher.videosCount || 0 %></span></p>
-            <p>total likes: <span><%= teacher.likesCount || 0 %></span></p>
-            <a href="/teacher/<%= teacher._id %>" class="inline-btn">view profile</a>
+
+            <div class="row">
+                <% teachers.forEach(teacher => { %>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="teacher-card text-center p-4 h-100" style="background:#fff; border-radius:18px; box-shadow:0 4px 18px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                            <img src="<%= teacher.profilePicture || '/images/default-avatar.png' %>" alt="<%= teacher.name %>" class="teacher-avatar mb-3" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #4a90e2;">
+                            <h4 class="card-title fw-bold mb-1"><%= teacher.name || (teacher.firstName + ' ' + teacher.lastName) %></h4>
+                            <p class="text-muted mb-3"><%= teacher.profession || 'Expert Instructor' %></p>
+                            
+                            <div class="teacher-stats d-flex justify-content-around my-3">
+                                <div class="stat">
+                                    <h5 class="fw-bold"><%= teacher.courses_created || 0 %></h5>
+                                    <small class="text-muted">Courses</small>
+                                </div>
+                                <div class="stat">
+                                    <h5 class="fw-bold"><%= teacher.students || 0 %></h5>
+                                    <small class="text-muted">Students</small>
+                                </div>
+                            </div>
+
+                            <a href="/teacher/<%= teacher._id %>" class="btn btn-outline-primary mt-auto">View Profile</a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
         </div>
-        <% }); %>
-    </div>
-</section>
+    </section>
+</div>
+
+<style>
+    .teacher-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    .teacher-avatar {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+</style>
 
 <%- include('partials/footer') %>
 <script src="/script.js"></script>

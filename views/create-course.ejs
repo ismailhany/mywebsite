@@ -164,49 +164,89 @@
     </div>
 </div>
 
+<script>
+// Basic client-side script for thumbnail preview
+document.addEventListener('DOMContentLoaded', function() {
+    const thumbnailInput = document.getElementById('thumbnail');
+    const thumbnailPreview = document.getElementById('thumbnail-preview');
+    const thumbnailDropArea = document.getElementById('thumbnail-drop-area');
+
+    function handleFileSelect(file) {
+        if (file && file.type.match('image.*')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                thumbnailPreview.querySelector('img').src = e.target.result;
+                thumbnailPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // Handle file selection
+    thumbnailInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+
+    // --- Drag and Drop ---
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        thumbnailDropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function highlight() {
+        thumbnailDropArea.classList.add('highlight');
+    }
+    function unhighlight() {
+        thumbnailDropArea.classList.remove('highlight');
+    }
+    ['dragenter', 'dragover'].forEach(eventName => thumbnailDropArea.addEventListener(eventName, highlight, false));
+    ['dragleave', 'drop'].forEach(eventName => thumbnailDropArea.addEventListener(eventName, unhighlight, false));
+
+    thumbnailDropArea.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files[0];
+        thumbnailInput.files = e.dataTransfer.files; // Assign dropped file to the input
+        handleFileSelect(file);
+    });
+});
+</script>
+
 <style>
 .page-wrapper {
     display: flex;
-    min-height: calc(100vh - 70px); /* Adjust based on header height */
-    margin-top: 70px; /* Adjust based on header height */
+    min-height: calc(100vh - 70px);
+    margin-top: 70px;
 }
-
 .main-content-wrapper {
     flex: 1;
     padding: 20px;
     background-color: #f8f9fa;
 }
-
 .create-course-header {
     border-bottom: 2px solid #f0f0f0;
     padding-bottom: 1rem;
     margin-bottom: 2rem;
 }
-
 .card {
     border: none;
     border-radius: 15px;
     background: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 .card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
-
 .form-control, .form-select {
     border-radius: 10px;
     border: 1px solid #e0e0e0;
     padding: 0.8rem 1rem;
     transition: all 0.3s ease;
 }
-
 .form-control:focus, .form-select:focus {
     border-color: #4a90e2;
     box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
 }
-
 .thumbnail-upload-area {
     background-color: #f8f9fa;
     border: 2px dashed #dee2e6;
@@ -214,12 +254,10 @@
     transition: all 0.3s ease;
     cursor: pointer;
 }
-
-.thumbnail-upload-area:hover {
+.thumbnail-upload-area:hover, .thumbnail-upload-area.highlight {
     border-color: #4a90e2;
     background-color: #f0f7ff;
 }
-
 .btn-primary {
     padding: 1rem;
     border-radius: 10px;
@@ -228,120 +266,28 @@
     background: linear-gradient(45deg, #4a90e2, #357abd);
     border: none;
 }
-
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
     background: linear-gradient(45deg, #357abd, #4a90e2);
 }
-
 .form-label {
     color: #2c3e50;
     font-size: 0.95rem;
 }
-
 .form-text {
     color: #6c757d;
     font-size: 0.85rem;
 }
-
 .card-title {
     color: #2c3e50;
     font-weight: 600;
-    font-size: 1.2rem;
 }
-
 #thumbnail-preview img {
+    max-width: 100%;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-}
-
-.input-group-text {
-    background-color: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    color: #6c757d;
-}
-
-@media (max-width: 991.98px) {
-    .page-wrapper {
-        flex-direction: column;
-    }
-    
-    .main-content-wrapper {
-        margin-left: 0;
-    }
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Thumbnail preview
-    const thumbnailInput = document.getElementById('thumbnail');
-    const preview = document.getElementById('thumbnail-preview');
-    const dropArea = document.getElementById('thumbnail-drop-area');
-
-    thumbnailInput.addEventListener('change', function(e) {
-        handleFile(e.target.files[0]);
-    });
-
-    // Drag and drop functionality
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, highlight, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, unhighlight, false);
-    });
-
-    function highlight(e) {
-        dropArea.classList.add('border-primary');
-    }
-
-    function unhighlight(e) {
-        dropArea.classList.remove('border-primary');
-    }
-
-    dropArea.addEventListener('drop', handleDrop, false);
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        handleFile(files[0]);
-    }
-
-    function handleFile(file) {
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.querySelector('img').src = e.target.result;
-                preview.style.display = 'block';
-            }
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Form validation
-    const form = document.querySelector('.create-course-form');
-    form.addEventListener('submit', function(e) {
-        if (!form.checkValidity()) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        form.classList.add('was-validated');
-    });
-});
-</script>
 
 <%- include('partials/footer') %> 

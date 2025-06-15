@@ -1,0 +1,175 @@
+<%- include('partials/header') %>
+
+<div class="page-wrapper">
+    <%- include('partials/sidebar') %>
+
+    <div class="main-content-wrapper manage-course-page">
+        <div class="container-fluid py-4">
+            <!-- Course Header -->
+            <div class="manage-course-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="mb-2">Manage Course</h2>
+                        <p class="text-muted mb-0">Editing: <strong><%= course.title %></strong></p>
+                    </div>
+                    <div class="course-actions">
+                        <a href="/courses/<%= course._id %>" class="btn btn-outline-primary me-2" target="_blank">
+                            <i class="fas fa-eye me-2"></i>Preview
+                        </a>
+                        <a href="/courses/<%= course._id %>/edit" class="btn btn-outline-secondary">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Row -->
+            <div class="stat-card-row">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-number"><%= studentCount %></p>
+                        <p class="stat-label">Total Students</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-list-ul"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-number"><%= course.lessons.length %></p>
+                        <p class="stat-label">Total Lessons</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-number"><%= course.duration || 0 %></p>
+                        <p class="stat-label">Course Hours</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-number">4.5</p>
+                        <p class="stat-label">Average Rating</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Row -->
+            <div class="row g-4">
+                <!-- Left Column: Edit Course Details -->
+                <div class="col-lg-7">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h4 class="card-title">
+                                <i class="fas fa-edit me-2"></i>Course Information
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <form action="/courses/<%= course._id %>/manage/update-details" method="POST">
+                                <div class="mb-4">
+                                    <label for="title" class="form-label fw-bold">Course Title</label>
+                                    <input type="text" class="form-control form-control-lg" id="title" name="title" value="<%= course.title %>" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="description" class="form-label">Course Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" required><%= course.description %></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="videoUrl" class="form-label">Course Video URL</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-video"></i></span>
+                                        <input type="url" class="form-control" id="videoUrl" name="videoUrl" 
+                                            placeholder="Enter YouTube or Vimeo video URL" 
+                                            value="<%= course.videoUrl || '' %>">
+                                    </div>
+                                    <small class="form-text text-muted">Enter a YouTube or Vimeo video URL to add a preview video to your course.</small>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="price" class="form-label">Course Price ($)</label>
+                                    <input type="number" class="form-control" id="price" name="price" value="<%= course.price || '' %>" required>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Course Content -->
+                <div class="col-lg-5">
+                    <div class="content-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">
+                                <i class="fas fa-list-alt me-2"></i>Course Content
+                            </h4>
+                            <span class="badge bg-primary"><%= course.lessons.length %> Lessons</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- List Existing Lessons -->
+                            <div class="lessons-list mb-4">
+                                <% if (course.lessons && course.lessons.length > 0) { %>
+                                    <% course.lessons.forEach((lesson, index) => { %>
+                                        <div class="lesson-item">
+                                            <div class="lesson-header">
+                                                <span class="lesson-number"><%= index + 1 %></span>
+                                                <h5 class="lesson-title"><%= lesson.title %></h5>
+                                            </div>
+                                            <p class="lesson-description"><%= lesson.description %></p>
+                                            <div class="lesson-actions">
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit me-1"></i>Edit
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash me-1"></i>Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-book-open fa-3x mb-3"></i>
+                                        <p>No lessons added yet. Start by adding your first lesson below.</p>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <!-- Add New Lesson Form -->
+                            <div class="add-lesson-form">
+                                <h5 class="form-title">
+                                    <i class="fas fa-plus-circle me-2"></i>Add New Lesson
+                                </h5>
+                                <form action="/courses/<%= course._id %>/manage/add-lesson" method="POST">
+                                    <div class="mb-3">
+                                        <label for="lessonTitle" class="form-label fw-bold">Lesson Title</label>
+                                        <input type="text" class="form-control" id="lessonTitle" name="title" placeholder="e.g., Introduction to the Course" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="lessonDescription" class="form-label fw-bold">Description</label>
+                                        <textarea class="form-control" id="lessonDescription" name="description" rows="3" placeholder="What will students learn in this lesson?"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-2"></i>Add Lesson
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %> 

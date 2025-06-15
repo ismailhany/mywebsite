@@ -1,0 +1,36 @@
+<div class="course-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1 class="course-title"><%= course.title %></h1>
+                <p class="course-description"><%= course.description %></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% if (course.videoUrl) { %>
+<div class="course-video-section py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="video-container">
+                    <div class="ratio ratio-16x9">
+                        <% if (course.videoUrl.includes('youtube.com') || course.videoUrl.includes('youtu.be')) { %>
+                            <iframe src="<%= course.videoUrl.replace('watch?v=', 'embed/') %>" 
+                                    title="Course Preview" 
+                                    allowfullscreen></iframe>
+                        <% } else if (course.videoUrl.includes('vimeo.com')) { %>
+                            <iframe src="<%= course.videoUrl.replace('vimeo.com', 'player.vimeo.com/video') %>" 
+                                    title="Course Preview" 
+                                    allowfullscreen></iframe>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<div class="course-content"> 

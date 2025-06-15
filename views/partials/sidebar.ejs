@@ -25,12 +25,14 @@
             <div class="nav-section">
                 <h5>Main Menu</h5>
                 <ul>
+                    <% if (!user || user.role !== 'teacher') { %>
                     <li>
                         <a href="/dashboard" class="<%= path === '/dashboard' ? 'active' : '' %>">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
+                    <% } %>
                     <li>
                         <a href="/courses" class="<%= path === '/courses' ? 'active' : '' %>">
                             <i class="fas fa-book"></i>
@@ -56,19 +58,19 @@
                                 <span>Create Course</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="/courses/manage" class="<%= path === '/courses/manage' ? 'active' : '' %>">
-                                <i class="fas fa-cog"></i>
-                                <span>Manage Courses</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/analytics" class="<%= path === '/analytics' ? 'active' : '' %>">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Analytics</span>
-                            </a>
-                        </li>
+                        
+                        
                     </ul>
+                </div>
+            <% } %>
+            
+            <% if (user && user.role === 'teacher') { %>
+                <div class="sidebar-group">
+                    <h3 class="sidebar-title">Teacher</h3>
+                    <a href="/teacher/courses" class="sidebar-link <%= (path === '/teacher/courses' || path.startsWith('/courses/create') || path.includes('/manage')) ? 'active' : '' %>">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>My Courses</span>
+                    </a>
                 </div>
             <% } %>
             

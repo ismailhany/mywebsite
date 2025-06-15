@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+
+<div class="page-wrapper">
+    <%- include('partials/sidebar') %>
+    
+    <div class="main-content-wrapper">
+        <div class="container-fluid py-4">
+            <div class="header mb-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary">My Courses</h2>
+                    <p class="text-muted">Here you can manage all the courses you have created.</p>
+                </div>
+                <a href="/courses/create" class="btn btn-success">
+                    <i class="fas fa-plus-circle me-2"></i>Create New Course
+                </a>
+            </div>
+
+            <div class="course-list">
+                <% if (courses && courses.length > 0) { %>
+                    <div class="list-group">
+                        <% courses.forEach(course => { %>
+                            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3 mb-2 shadow-sm" style="border-radius: 10px;">
+                                <div class="d-flex align-items-center">
+                                    <img src="<%= course.thumbnail %>" alt="<%= course.title %>" style="width: 100px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 20px;">
+                                    <div>
+                                        <h5 class="mb-1"><%= course.title %></h5>
+                                        <small class="text-muted">Created: <%= new Date(course.createdAt).toLocaleDateString() %></small>
+                                    </div>
+                                </div>
+                                <a href="/courses/<%= course._id %>/manage" class="btn btn-primary">Manage</a>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="text-center p-5 border rounded bg-light">
+                        <h4>You haven't created any courses yet.</h4>
+                        <p>Get started by creating your first course and sharing your knowledge.</p>
+                        <a href="/courses/create" class="btn btn-success mt-3">
+                            <i class="fas fa-plus-circle me-2"></i>Create Your First Course
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper { display: flex; min-height: calc(100vh - 70px); margin-top: 70px; }
+.main-content-wrapper { flex: 1; padding: 20px; background-color: #f8f9fa; }
+</style>
+
+<%- include('partials/footer') %> 

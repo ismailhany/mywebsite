@@ -1,7 +1,6 @@
-// This is a dummy line to force module re-evaluation.
 const express = require('express');
 const control = require('../controllers/control');
-const { uploadConfigs } = require('../config/upload');
+const { uploadConfigs, handleUploadError } = require('../config/upload');
 const { isAuthenticated, isTeacher } = require('../middleware/roleCheck');
 
 const router = express.Router();
@@ -9,13 +8,15 @@ const router = express.Router();
 // Public routes
 router.get('/', control.home);
 router.get('/about', control.about);
+router.post('/about/review', control.addReview);
 router.get('/contact', control.contactGet);
+router.post('/contact', control.contactPost);
 
 // Authentication routes
 router.get('/login', control.loginGet);
 router.post('/login', control.loginPost);
 router.get('/register', control.registerGet);
-router.post('/register', control.registerPost);
+router.post('/register', uploadConfigs.profilePicture.single('image'), handleUploadError, control.registerPost);
 router.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -25,23 +26,29 @@ router.get('/logout', (req, res) => {
                 message: 'Failed to logout'
             });
         }
+        res.clearCookie('mySession');
+        res.clearCookie('token');
         res.redirect('/login');
     });
 });
 
 // Protected routes
-console.log('Value of control.dashboard:', control.dashboard); // Debugging line
+console.log('Value of control.dashboard:', control.dashboard);
 router.get('/dashboard', isAuthenticated, control.dashboard);
 router.post('/courses/:id/enroll', isAuthenticated, control.enrollCourse);
 
 // Teacher routes
 router.get('/courses', control.getCourses);
 router.get('/courses/create', isAuthenticated, isTeacher, control.createCourseGet);
-router.post('/courses', isAuthenticated, isTeacher, uploadConfigs.courseThumbnail.single('thumbnail'), control.createCourse);
+router.post('/courses', isAuthenticated, isTeacher, uploadConfigs.courseThumbnail.single('thumbnail'), handleUploadError, control.createCourse);
 router.get('/courses/:id', control.getCourse);
 router.get('/courses/:id/edit', isAuthenticated, isTeacher, control.updateCourseGet);
 router.post('/courses/:id', isAuthenticated, isTeacher, uploadConfigs.courseThumbnail.single('thumbnail'), control.updateCourse);
 router.post('/courses/:id/delete', isAuthenticated, isTeacher, control.deleteCourse);
+router.get('/courses/:id/manage', isAuthenticated, isTeacher, control.manageCourseGet);
+router.post('/courses/:id/manage/update-details', isAuthenticated, isTeacher, control.updateCourseDetails);
+router.post('/courses/:id/manage/add-lesson', isAuthenticated, isTeacher, control.addLessonToCourse);
+router.get('/teacher/courses', isAuthenticated, isTeacher, control.getTeacherCourses);
 
 // Add multiple videos to a course
 router.post('/courses/:courseId/videos', isAuthenticated, isTeacher, control.addCourseVideos);
@@ -49,12 +56,12 @@ router.post('/courses/:courseId/videos', isAuthenticated, isTeacher, control.add
 // Profile routes
 router.get('/profile', isAuthenticated, control.profile);
 router.get('/profile/edit', isAuthenticated, control.update);
-router.post('/profile/edit', isAuthenticated,  control.updateProfile);
+router.post('/profile/edit', isAuthenticated, control.updateProfile);
 
 // Settings route
 router.get('/settings', isAuthenticated, control.settings);
-router.post('/update-profile-picture', isAuthenticated, control.updateProfilePicture);
-
+router.post('/update-profile-picture', isAuthenticated, uploadConfigs.profilePicture.single('image'), handleUploadError, control.updateProfilePicture);
+router.post('/update-password', isAuthenticated, control.updatePassword);
 
 // Help Center route
 router.get('/help', control.help);
@@ -72,7 +79,7 @@ router.post('/playlists/:id/delete', isAuthenticated, isTeacher, control.deleteP
 router.get('/videos', control.getVideos);
 router.get('/videos/create', isAuthenticated, isTeacher, control.createVideoGet);
 router.post('/videos', isAuthenticated, isTeacher, uploadConfigs.courseVideo.single('video'), control.createVideo);
-router.get('/videos/:id', control.getVideo);
+router.get('/videos/:id', control.getVideo); // Fixed typo from getCourse
 router.get('/videos/:id/edit', isAuthenticated, isTeacher, control.updateVideoGet);
 router.post('/videos/:id', isAuthenticated, isTeacher, uploadConfigs.courseVideo.single('video'), control.updateVideo);
 router.post('/videos/:id/delete', isAuthenticated, isTeacher, control.deleteVideo);
@@ -104,6 +111,3 @@ router.post('/sync-liked-courses', (req, res) => {
 });
 
 module.exports = router;
-
-
-

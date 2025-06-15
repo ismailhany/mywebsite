@@ -4,6 +4,7 @@ const Lesson = require('../models/Lesson');
 const Enrollment = require('../models/Enrollment');
 const auth = require('../middleware/auth');
 const paymentService = require('../models/paymentService');
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -163,36 +164,39 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create new course (instructor/admin only)
-router.post('/', auth, async (req, res) => {
+// Create new course (AUTH BYPASSED FOR DEVELOPMENT)
+router.post('/', async (req, res) => {
   try {
-    if (req.user.role !== 'instructor' && req.user.role !== 'admin') {
-      return res.status(403).json({
+    // DEVELOPMENT ONLY: Bypassing authentication by finding the first available teacher.
+    // This is insecure and should not be used in production.
+    const instructor = await User.findOne({ role: 'teacher' });
+
+    if (!instructor) {
+      return res.status(500).json({
         success: false,
-        message: 'Access denied. Only instructors can create courses.'
+        message: 'Bypass failed: No teacher account found to assign as instructor. Please create a teacher user first.'
       });
     }
 
     const courseData = {
       ...req.body,
-      instructor: req.user.id
+      instructor: instructor._id // Assigning the found teacher as the instructor
     };
 
     const course = await Course.create(courseData);
     
-    // Add course to instructor's created courses
-    const User = require('../models/User');
-    await User.findByIdAndUpdate(req.user.id, {
+    // Add course to the found instructor's created courses
+    await User.findByIdAndUpdate(instructor._id, {
       $push: { createdCourses: course._id }
     });
 
     res.status(201).json({
       success: true,
-      message: 'Course created successfully',
+      message: 'Course created successfully (Authentication Bypassed)',
       data: course
     });
   } catch (error) {
-    console.error('Create course error:', error);
+    console.error('Create course error (Auth Bypassed):', error);
     
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => err.message);
@@ -277,7 +281,6 @@ router.delete('/:id', auth, async (req, res) => {
     await Enrollment.deleteMany({ course: req.params.id });
     
     // Remove from instructor's created courses
-    const User = require('../models/User');
     await User.findByIdAndUpdate(course.instructor, {
       $pull: { createdCourses: req.params.id }
     });

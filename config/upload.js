@@ -9,33 +9,14 @@ const ensureDirectoryExists = (dir) => {
   }
 };
 
-// Storage configuration
-const createStorage = (uploadPath) => {
-  return multer.diskStorage({
-    destination: (req, file, cb) => {
-      const fullPath = path.join(__dirname, '..', 'public', 'uploads', uploadPath);
-      console.log('Creating upload directory:', fullPath);
-      ensureDirectoryExists(fullPath);
-      cb(null, fullPath);
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const extension = path.extname(file.originalname);
-      const filename = file.fieldname + '-' + uniqueSuffix + extension;
-      console.log('Generated filename:', filename);
-      cb(null, filename);
-    }
-  });
-};
-
 // File filters
 const imageFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
-
-  if (mimetype && extname) return cb(null, true);
-  cb(new Error('Only image files are allowed (jpeg, jpg, png, gif, webp)'));
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only JPEG, PNG, GIF and WebP images are allowed.'), false);
+  }
 };
 
 const videoFilter = (req, file, cb) => {
@@ -61,6 +42,25 @@ const generalFilter = (req, file, cb) => {
 
   if (extname) return cb(null, true);
   cb(new Error('File type not allowed'));
+};
+
+// Storage configuration
+const createStorage = (uploadPath) => {
+  return multer.diskStorage({
+    destination: (req, file, cb) => {
+      const fullPath = path.join(__dirname, '..', 'public', 'uploads', uploadPath);
+      console.log('Creating upload directory:', fullPath);
+      ensureDirectoryExists(fullPath);
+      cb(null, fullPath);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const extension = path.extname(file.originalname);
+      const filename = file.fieldname + '-' + uniqueSuffix + extension;
+      console.log('Generated filename:', filename);
+      cb(null, filename);
+    }
+  });
 };
 
 // Upload configurations
