@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLearn - Modern Online Learning Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<%- include('partials/header', { path: path }) %>
+<%- include('partials/sidebar', { path: path }) %>
+<div class="page-content">
+    <section class="hero" style="display:flex;align-items:center;justify-content:center;min-height:60vh;background:linear-gradient(120deg,#4a90e2 0%,#2c3e50 100%);color:#fff;padding:3rem 0 2rem 0;">
+        <div class="hero-content" style="max-width:600px;text-align:center;margin:auto;">
+            <h1 style="font-size:2.8rem;font-weight:800;line-height:1.1;">Learn Without Limits</h1>
+            <p style="font-size:1.2rem;margin:1.5rem 0 2rem 0;">Start, switch, or advance your career with thousands of courses from expert instructors.</p>
+            <div class="hero-buttons" style="display:flex;gap:1.5rem;justify-content:center;">
+                <a href="/courses" class="btn btn-primary" style="font-size:1.1rem;padding:0.8rem 2.2rem;">Browse Courses</a>
+                <a href="/register" class="btn btn-outline" style="font-size:1.1rem;padding:0.8rem 2.2rem;">Join for Free</a>
+            </div>
+        </div>
+        <div class="hero-image" style="display:none;"></div>
+    </section>
+
+    <section class="features" style="background:#f8f9fa;padding:3rem 0;">
+        <div class="container">
+            <h2 class="section-title" style="text-align:center;margin-bottom:2.5rem;">Why Choose LearnHub?</h2>
+            <div class="features-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;">
+                <div class="feature-card" style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:2rem;text-align:center;">
+                    <i class="fas fa-graduation-cap" style="font-size:2.2rem;color:#4a90e2;"></i>
+                    <h3 style="margin:1rem 0 0.5rem;">Expert Instructors</h3>
+                    <p>Learn from industry professionals with years of experience.</p>
+                </div>
+                <div class="feature-card" style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:2rem;text-align:center;">
+                    <i class="fas fa-laptop-code" style="font-size:2.2rem;color:#4a90e2;"></i>
+                    <h3 style="margin:1rem 0 0.5rem;">Flexible Learning</h3>
+                    <p>Study at your own pace, anywhere and anytime.</p>
+                </div>
+                <div class="feature-card" style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:2rem;text-align:center;">
+                    <i class="fas fa-certificate" style="font-size:2.2rem;color:#4a90e2;"></i>
+                    <h3 style="margin:1rem 0 0.5rem;">Certification</h3>
+                    <p>Earn certificates to showcase your skills.</p>
+                </div>
+                <div class="feature-card" style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:2rem;text-align:center;">
+                    <i class="fas fa-users" style="font-size:2.2rem;color:#4a90e2;"></i>
+                    <h3 style="margin:1rem 0 0.5rem;">Community</h3>
+                    <p>Join a community of learners and share experiences.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="popular-courses" style="background:#fff;padding:3rem 0;">
+        <div class="container">
+            <h2 class="section-title" style="text-align:center;margin-bottom:2.5rem;">Popular Courses</h2>
+            <div class="courses-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;">
+                <% courses.slice(0, 4).forEach(course=> { %>
+                    <div class="course-card" style="background:#f8f9fa;border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,0.08);overflow:hidden;transition:box-shadow 0.2s;display:flex;flex-direction:column;min-height:420px;position:relative;">
+                        <div class="course-image" style="position:relative;width:100%;height:180px;overflow:hidden;">
+                            <img src="<%= course.thumbnail %>" alt="<%= course.title %>" style="width:100%;height:100%;object-fit:cover;">
+                            <div class="course-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;">
+                                <a href="/courses/<%= course._id %>" class="btn btn-primary" style="padding:0.5rem 1.2rem;border-radius:20px;font-size:1rem;">View Course</a>
+                            </div>
+                        </div>
+                        <div class="course-content" style="flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:1.2rem;">
+                            <div>
+                                <div class="course-category" style="font-size:0.95rem;color:#4a90e2;font-weight:600;margin-bottom:0.5rem;text-transform:capitalize;letter-spacing:0.5px;">
+                                    <%= course.category %>
+                                </div>
+                                <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:0.5rem;color:#23272a;">
+                                    <%= course.title %>
+                                </h3>
+                                <p style="color:#666;font-size:0.98rem;margin-bottom:0.7rem;">
+                                    <%= course.description?.substring(0, 100) %>...
+                                </p>
+                            </div>
+                            <div class="course-meta" style="display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;margin-bottom:0.7rem;">
+                                <div class="course-rating" style="display:flex;align-items:center;gap:0.3rem;color:#f5b50a;font-size:0.98rem;">
+                                    <i class="fas fa-star"></i>
+                                    <span style="color:#23272a;font-weight:500;"> <%= course.rating?.toFixed(1) %> </span>
+                                </div>
+                                <div class="course-students" style="display:flex;align-items:center;gap:0.3rem;color:#4a90e2;font-size:0.98rem;">
+                                    <i class="fas fa-users"></i>
+                                    <span style="color:#23272a;font-weight:500;"> <%= course.enrolledStudents?.length %> students </span>
+                                </div>
+                            </div>
+                            <div class="course-footer" style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f0f0f0;padding-top:0.7rem;">
+                                <div class="course-price" style="font-size:1.05rem;font-weight:600;color:#28a745;">
+                                    <% if (course.price===0) { %>
+                                        <span class="free">Free</span>
+                                        <% } else { %>
+                                            <span class="price">$<%= course.price %></span>
+                                            <% } %>
+                                </div>
+                                <div class="course-duration" style="display:flex;align-items:center;gap:0.3rem;color:#888;font-size:0.97rem;">
+                                    <i class="fas fa-clock"></i>
+                                    <span>
+                                        <%= course.duration %> hours
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/courses" class="btn btn-primary" style="font-size:1.1rem;padding:0.8rem 2.2rem;">View All Courses</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials" style="background:#f8f9fa;padding:3rem 0;">
+        <div class="container">
+            <h2 class="section-title" style="text-align:center;margin-bottom:2.5rem;">What Our Students Say</h2>
+            <div class="testimonials-slider" style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;">
+                <div class="testimonial-card" style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:2rem;max-width:340px;text-align:center;">
+                    <div class="testimonial-content">
+                        <p>"LearnHub has transformed my career. The courses are well-structured and the instructors are amazing!"</p>
+                    </div>
+                    <div class="testimonial-author" style="margin-top:1.2rem;display:flex;align-items:center;gap:1rem;justify-content:center;">
+                        <img src="/images/testimonial-1.jpg" alt="Sarah Johnson" style="width:56px;height:56px;border-radius:50%;object-fit:cover;">
+                        <div class="author-info" style="text-align:left;">
+                            <h4 style="margin:0;font-size:1.1rem;">Sarah Johnson</h4>
+                            <span style="font-size:0.95rem;color:#888;">Web Developer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card" style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:2rem;max-width:340px;text-align:center;">
+                    <div class="testimonial-content">
+                        <p>"The flexibility of learning at my own pace has been incredible. I've learned so much!"</p>
+                    </div>
+                    <div class="testimonial-author" style="margin-top:1.2rem;display:flex;align-items:center;gap:1rem;justify-content:center;">
+                        <img src="/images/testimonial-2.jpg" alt="Michael Chen" style="width:56px;height:56px;border-radius:50%;object-fit:cover;">
+                        <div class="author-info" style="text-align:left;">
+                            <h4 style="margin:0;font-size:1.1rem;">Michael Chen</h4>
+                            <span style="font-size:0.95rem;color:#888;">Data Scientist</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card" style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:2rem;max-width:340px;text-align:center;">
+                    <div class="testimonial-content">
+                        <p>"The community support and expert guidance have been invaluable to my learning journey."</p>
+                    </div>
+                    <div class="testimonial-author" style="margin-top:1.2rem;display:flex;align-items:center;gap:1rem;justify-content:center;">
+                        <img src="/images/testimonial-3.jpg" alt="Emily Rodriguez" style="width:56px;height:56px;border-radius:50%;object-fit:cover;">
+                        <div class="author-info" style="text-align:left;">
+                            <h4 style="margin:0;font-size:1.1rem;">Emily Rodriguez</h4>
+                            <span style="font-size:0.95rem;color:#888;">UX Designer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" style="background:linear-gradient(120deg,#4a90e2 0%,#2c3e50 100%);color:#fff;padding:3rem 0;">
+        <div class="container">
+            <div class="cta-content" style="text-align:center;max-width:600px;margin:auto;">
+                <h2 style="font-size:2.2rem;font-weight:700;">Ready to Start Learning?</h2>
+                <p style="font-size:1.15rem;margin:1.2rem 0 2rem 0;">Join thousands of students worldwide and start your learning journey today.</p>
+                <div class="cta-buttons" style="display:flex;gap:1.5rem;justify-content:center;">
+                    <a href="/register" class="btn btn-primary" style="font-size:1.1rem;padding:0.8rem 2.2rem;">Get Started</a>
+                    <a href="/courses" class="btn btn-outline" style="font-size:1.1rem;padding:0.8rem 2.2rem;">Browse Courses</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<%- include('partials/footer') %>
+<script src="/script.js"></script>
+</body>
+</html>

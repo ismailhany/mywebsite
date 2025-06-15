@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Learning Platform</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- JavaScript -->
+    <script src="/script.js" defer></script>
+    <script src="/actions.js" defer></script>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="nav-container">
+            <div class="logo">
+                <a href="/">
+                    <img src="/images/logo.png" alt="Learning Platform Logo">
+                    <span>LearnHub</span>
+                </a>
+            </div>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-link <%= path === '/' ? 'active' : '' %>">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="/courses" class="nav-link <%= path === '/courses' ? 'active' : '' %>">
+                    <i class="fas fa-book"></i> Courses
+                </a>
+                <a href="/teachers" class="nav-link <%= path === '/teachers' ? 'active' : '' %>">
+                    <i class="fas fa-chalkboard-teacher"></i> Teachers
+                </a>
+                <a href="/about" class="nav-link <%= path === '/about' ? 'active' : '' %>">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+                <a href="/contact" class="nav-link <%= path === '/contact' ? 'active' : '' %>">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+            </div>
+            
+            <div class="nav-auth">
+                <button id="globalDarkModeBtn" style="background:none; border:none; outline:none; cursor:pointer; font-size:1.5rem; margin-right:1.2rem; color:#4a90e2;" title="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <% if (user) { %>
+                    <div class="user-menu">
+                        <button class="user-menu-btn">
+                            <img src="<%= user.profilePicture || '/images/default-avatar.png' %>" alt="Profile" class="avatar">
+                            <span><%= user.name %></span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown">
+                            <a href="/dashboard">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                            <a href="/profile">
+                                <i class="fas fa-user"></i> Profile
+                            </a>
+                            <% if (user.role === 'teacher') { %>
+                                <a href="/courses/create">
+                                    <i class="fas fa-plus"></i> Create Course
+                                </a>
+                            <% } %>
+                            <a href="/logout" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <a href="/login" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="/register" class="btn btn-register">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                <% } %>
+            </div>
+            
+            <!--<button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>-->
+        </nav>
+    </header>
+    
+    <div class="mobile-menu">
+        <div class="mobile-nav-links">
+            <a href="/" class="mobile-nav-link">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="/courses" class="mobile-nav-link">
+                <i class="fas fa-book"></i> Courses
+            </a>
+            <a href="/teachers" class="mobile-nav-link">
+                <i class="fas fa-chalkboard-teacher"></i> Teachers
+            </a>
+            <a href="/about" class="mobile-nav-link">
+                <i class="fas fa-info-circle"></i> About
+            </a>
+            <a href="/contact" class="mobile-nav-link">
+                <i class="fas fa-envelope"></i> Contact
+            </a>
+        </div>
+    </div>
+    
+    <main class="main-content">

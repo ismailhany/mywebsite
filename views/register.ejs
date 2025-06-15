@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education - Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+        <%- include('partials/sidebar') %>
+            <div class="page-content">
+                <section class="form-container">
+                    <form action="/register" method="post" enctype="multipart/form-data" id="registerForm">
+                        <h3>register new</h3>
+
+                        <!-- <div class="form-group">
+                        <label for="name">your nam</label>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="text" id="name" name="name" placeholder="enter your name" maxlength="100" required class="box">
+                        </div>
+                    </div> -->
+
+                        <div class="form-group">
+                            <label for="name">Your Name<span>*</span></label>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="name" name="name" placeholder="enter your name" maxlength="100"
+                                    required class="box">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="role">I am a<span>*</span></label>
+                            <div class="input-group">
+                                <i class="fas fa-user-tag"></i>
+                                <select name="role" id="role" required class="box">
+                                    <option value="">Select your role</option>
+                                    <option value="student">Student</option>
+                                    <option value="teacher">Teacher</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Your email<span>*</span></label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" name="email" placeholder="enter your email" maxlength="100" required
+                                    class="box">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Your password<span>*</span></label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" name="password" placeholder="enter your password" maxlength="50"
+                                    required class="box">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm password<span>*</span></label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" name="confirm_password" placeholder="confirm your password"
+                                    maxlength="50" required class="box">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="image">Select pic</label>
+                            <div class="input-group">
+                                <i class="fas fa-image"></i>
+                                <input type="file" name="image" accept="image/*" class="box">
+                            </div>
+                        </div>
+
+                        <button type="submit" name="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Register now
+                        </button>
+                    </form>
+                </section>
+            </div>
+
+
+            <%- include('partials/footer') %>
+                <script src="/script.js"></script>
+</body>
+
+</html>

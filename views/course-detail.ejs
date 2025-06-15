@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLearn - Courses</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .video-list {
+            margin-top: 2rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        .video-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .video-item:hover {
+            background-color: #f8f9fa;
+        }
+        .video-item:last-child {
+            border-bottom: none;
+        }
+        .video-number {
+            width: 30px;
+            height: 30px;
+            background: #4a90e2;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: 600;
+        }
+        .video-info {
+            flex: 1;
+        }
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .video-duration {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .video-play {
+            color: #4a90e2;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+        <%- include('partials/sidebar') %>
+
+            <div class="page-content">
+
+                <section class="courses-grid">
+                    <div class="container">
+                        <div class="courses-container">
+                            <div class="course-card" data-category="<%= course.category %>"
+                                data-level="<%= course.level %>"
+                                data-price="<%= course.price === 0 ? 'free' : 'paid' %>"
+                                data-rating="<%= course.rating %>">
+                                <h3>
+                                    <%= course.title %>
+                                </h3>
+                                <div class="course-image">
+                                    <img src="/<%= course.thumbnail %>" alt="<%= course.title %>" style="width: 50%;">
+                                </div>
+                                <div class="course-content">
+                                    <div class="course-category">
+                                        <%= course.category %>
+                                    </div>
+                                    <p>
+                                        <%= course.description?.substring(0, 100) %>...
+                                    </p>
+                                    <div class="course-meta">
+                                        <div class="course-rating">
+                                            <i class="fas fa-star"></i>
+                                            <span>
+                                                Rating <%= course.rating?.toFixed(1) %>
+                                            </span>
+                                        </div>
+                                        <div class="course-students">
+                                            <i class="fas fa-users"></i>
+                                            <span>
+                                                <%= course.students || 0 %> students
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="course-footer">
+                                        <div class="course-price">
+                                            <% if (course.price===0) { %>
+                                                <span class="free">Free</span>
+                                                <% } else { %>
+                                                    <span class="price"><%= course.price || 0 %> $</span>
+                                                    <% } %>
+                                        </div>
+                                        <div class="course-duration">
+                                            <i class="fas fa-clock"></i>
+                                            <span>
+                                                <%= course.duration || "0 hours" %> 
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <% if (enrolled) { %>
+                                                <a href="/courses/<%= course._id %>"
+                                                                        class="btn btn-primary btn-sm">Continue
+                                                                        Learning</a>
+                                                <% } else { %>
+                                                    <a href="#" onclick='enrollCourse("<%= course._id %>")'
+                                                                        class="btn btn-primary btn-sm">Enroll</a>
+                                                    <% } %>
+                                            
+                                                                        
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <% if (user && course.instructor && (user.role === 'admin' || course.instructor._id.toString() === user._id.toString())) { %>
+                                <div class="add-video-section" style="margin-top: 2rem;">
+                                    <button class="btn" id="add-video-btn">Add Video</button>
+                                </div>
+                            <% } %>
+
+                            <!-- Video List Section -->
+                            <div class="video-list">
+                                <h3>Course Content</h3>
+                                <% if (course.videos && course.videos.length > 0) { %>
+                                    <% course.videos.sort((a, b) => a.order - b.order).forEach((video, index) => { %>
+                                        <div class="video-item" onclick="window.location.href='/watchvideo/<%= course._id %>/<%= video._id %>'">
+                                            <div class="video-number"><%= index + 1 %></div>
+                                            <div class="video-info">
+                                                <div class="video-title"><%= video.title %></div>
+                                                <div class="video-duration">
+                                                    <i class="fas fa-clock"></i>
+                                                    <%= Math.floor(video.duration / 60) %>:${(video.duration % 60).toString().padStart(2, '0')}
+                                                </div>
+                                            </div>
+                                            <div class="video-play">
+                                                <i class="fas fa-play-circle"></i>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } else if (course.title && course.title.toLowerCase() === 'complete html tutorial') { %>
+                                    <div class="video-item">
+                                        <div class="video-number">1</div>
+                                        <div class="video-info">
+                                            <div class="video-title">HTML Tutorial for Beginners - Part 1</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/6QAELgirvjs?si=koTHnS3lydIsNSun" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="video-item">
+                                        <div class="video-number">2</div>
+                                        <div class="video-info">
+                                            <div class="video-title">HTML Tutorial for Beginners - Part 2</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/7LxA9qXUY5k?si=e0kPI6TlDpvRr03f" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="video-item">
+                                        <div class="video-number">3</div>
+                                        <div class="video-info">
+                                            <div class="video-title">HTML Tutorial for Beginners - Part 3</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/QG5aEmS9Fu0?si=5z3kZuUMxoHlWIS4" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                <% } else if (course.title && course.title.toLowerCase() === 'complete css tutorial') { %>
+                                    <div class="video-item">
+                                        <div class="video-number">1</div>
+                                        <div class="video-info">
+                                            <div class="video-title">CSS Tutorial for Beginners - Part 1</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/X1ulCwyhCVM?si=AvJO8xwrRL_CNwLh" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="video-item">
+                                        <div class="video-number">2</div>
+                                        <div class="video-info">
+                                            <div class="video-title">CSS Tutorial for Beginners - Part 2</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/89VLfs-wpEY?si=nL5TjB7d6Oo0SgAL" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="video-item">
+                                        <div class="video-number">3</div>
+                                        <div class="video-info">
+                                            <div class="video-title">CSS Tutorial for Beginners - Part 3</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/66sjwQ-hB64?si=vAwwURi24ERXcg2A" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                <% } else if (course.title && course.title.trim().toLowerCase() === 'complete js tutorial') { %>
+                                    <div class="video-item">
+                                        <div class="video-number">1</div>
+                                        <div class="video-info">
+                                            <div class="video-title">JavaScript Tutorial for Beginners - Part 1</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/Ihy0QziLDf0?si=2fdqpcKftTSA-ihq" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="video-item">
+                                        <div class="video-number">2</div>
+                                        <div class="video-info">
+                                            <div class="video-title">JavaScript Tutorial for Beginners - Part 2</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/FyGIKD2fxIo?si=zhBHi22XhFO__-HM" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="video-item">
+                                        <div class="video-number">3</div>
+                                        <div class="video-info">
+                                            <div class="video-title">JavaScript Tutorial for Beginners - Part 3</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/Ihy0QziLDf0?si=_9vRZQRvCXOPKPy6" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="video-item">
+                                        <div class="video-number">4</div>
+                                        <div class="video-info">
+                                            <div class="video-title">JavaScript Tutorial for Beginners - Part 4</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/nbX0MIV7-Ek?si=d60jwiX6mAuJYXSe" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="video-item">
+                                        <div class="video-number">5</div>
+                                        <div class="video-info">
+                                            <div class="video-title">JavaScript Tutorial for Beginners - Part 5</div>
+                                            <div class="video-duration">
+                                                <i class="fas fa-clock"></i>
+                                                30:00
+                                            </div>
+                                        </div>
+                                        <div class="video-play">
+                                            <a href="https://youtu.be/FyGIKD2fxIo?si=_uSn25socUVBGNlL" target="_blank" style="color:inherit;"><i class="fas fa-play-circle"></i></a>
+                                        </div>
+                                    </div>
+                                <% } else { %>
+                                    <p>No videos available for this course yet.</p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <%- include('partials/footer') %>
+
+            <!-- Add Video Modal -->
+            <div id="add-video-modal" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h2>Add New Videos</h2>
+                    <form id="add-video-form">
+                        <div id="video-inputs">
+                            <div class="video-input-group">
+                                <input type="text" placeholder="Video Title" class="video-title-input" required>
+                                <input type="url" placeholder="YouTube URL" class="video-url-input" required>
+                                <input type="number" placeholder="Duration (seconds)" class="video-duration-input" required>
+                            </div>
+                        </div>
+                        <button type="button" id="add-another-video">Add Another Video</button>
+                        <button type="submit" class="btn">Save Videos</button>
+                    </form>
+                </div>
+            </div>
+
+            <script src="/script.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const addVideoBtn = document.getElementById('add-video-btn');
+                    const modal = document.getElementById('add-video-modal');
+                    const closeBtn = modal.querySelector('.close-button');
+                    const addAnotherVideoBtn = document.getElementById('add-another-video');
+                    const videoInputsContainer = document.getElementById('video-inputs');
+                    const addVideoForm = document.getElementById('add-video-form');
+
+                    if (addVideoBtn) {
+                        addVideoBtn.addEventListener('click', () => {
+                            modal.style.display = 'block';
+                        });
+                    }
+
+                    closeBtn.addEventListener('click', () => {
+                        modal.style.display = 'none';
+                    });
+
+                    window.addEventListener('click', (event) => {
+                        if (event.target === modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+
+                    addAnotherVideoBtn.addEventListener('click', () => {
+                        const newVideoInputGroup = document.createElement('div');
+                        newVideoInputGroup.classList.add('video-input-group');
+                        newVideoInputGroup.innerHTML = `
+                            <input type="text" placeholder="Video Title" class="video-title-input" required>
+                            <input type="url" placeholder="YouTube URL" class="video-url-input" required>
+                            <input type="number" placeholder="Duration (seconds)" class="video-duration-input" required>
+                        `;
+                        videoInputsContainer.appendChild(newVideoInputGroup);
+                    });
+
+                    addVideoForm.addEventListener('submit', async (event) => {
+                        event.preventDefault();
+                        
+                        const videoInputs = videoInputsContainer.querySelectorAll('.video-input-group');
+                        const videos = [];
+
+                        videoInputs.forEach(inputGroup => {
+                            const title = inputGroup.querySelector('.video-title-input').value;
+                            const url = inputGroup.querySelector('.video-url-input').value;
+                            const duration = inputGroup.querySelector('.video-duration-input').value;
+                            if (title && url && duration) {
+                                videos.push({ title, url, duration: parseInt(duration) });
+                            }
+                        });
+
+                        if (videos.length > 0) {
+                            try {
+                                const response = await fetch('/courses/<%= course._id %>/videos', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                    },
+                                    body: JSON.stringify({ videos })
+                                });
+
+                                const result = await response.json();
+
+                                if (result.success) {
+                                    alert('Videos added successfully!');
+                                    location.reload();
+                                } else {
+                                    alert('Error adding videos: ' + result.message);
+                                }
+                            } catch (error) {
+                                console.error('Failed to add videos:', error);
+                                alert('An error occurred while adding videos.');
+                            }
+                        }
+                    });
+                });
+            </script>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education - Teacher Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<section class="tutor-profile">
+    <h1 class="heading">profile details</h1>
+    <div class="details">
+        <div class="tutor">
+            <img src="/images/pic-2.jpg" alt="tutor profile">
+            <h3>john deo</h3>
+            <span>developer</span>
+        </div>
+        <div class="flex">
+            <p>total playlists : <span>4</span></p>
+            <p>total videos : <span>18</span></p>
+            <p>total likes : <span>1208</span></p>
+            <p>total comments : <span>52</span></p>
+        </div>
+    </div>
+</section>
+
+<section class="courses">
+    <h1 class="heading">our courses</h1>
+    <div class="box-container">
+        <% const courses = [
+            { thumb: 'thumb-1.png', title: 'complete HTML tutorial' },
+            { thumb: 'thumb-2.png', title: 'complete CSS tutorial' },
+            { thumb: 'thumb-3.png', title: 'complete js tutorial' },
+            { thumb: 'thumb-4.png', title: 'complete bootstrap tutorial' }
+        ];
+        
+        courses.forEach(course => { %>
+        <div class="box">
+            <img src="/images/<%= course.thumb %>" class="thumb" alt="course thumbnail">
+            <h3 class="title"><%= course.title %></h3>
+            <a href="/playlist" class="inline-btn">view playlist</a>
+        </div>
+        <% }); %>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+<script src="/script.js"></script>
+</body>
+</html>

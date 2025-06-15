@@ -1,0 +1,347 @@
+<%- include('partials/header') %>
+
+<div class="page-wrapper">
+    <%- include('partials/sidebar') %>
+    
+    <div class="main-content-wrapper">
+        <div class="container-fluid py-4">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="create-course-header mb-4">
+                        <h2 class="text-primary">Create New Course</h2>
+                        <p class="text-muted">Share your knowledge with the world</p>
+                    </div>
+                    <form action="/courses" method="POST" enctype="multipart/form-data" class="create-course-form">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <!-- Basic Information -->
+                                <div class="card mb-4 shadow-sm">
+                                    <div class="card-body">
+                                        <h4 class="card-title mb-4">
+                                            <i class="fas fa-info-circle text-primary me-2"></i>
+                                            Basic Information
+                                        </h4>
+                                        
+                                        <div class="mb-4">
+                                            <label for="title" class="form-label fw-bold">Course Title</label>
+                                            <input type="text" class="form-control form-control-lg" id="title" name="title" required maxlength="100" placeholder="Enter a descriptive title for your course">
+                                            <div class="form-text">Make it clear and engaging</div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label for="shortDescription" class="form-label fw-bold">Short Description</label>
+                                            <textarea class="form-control" id="shortDescription" name="shortDescription" rows="2" required maxlength="200" placeholder="Briefly describe what students will learn"></textarea>
+                                            <div class="form-text">Keep it concise and compelling</div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label for="description" class="form-label fw-bold">Full Description</label>
+                                            <textarea class="form-control" id="description" name="description" rows="4" required maxlength="1000" placeholder="Provide a detailed description of your course"></textarea>
+                                            <div class="form-text">Include key topics, learning outcomes, and target audience</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Course Details -->
+                                <div class="card mb-4 shadow-sm">
+                                    <div class="card-body">
+                                        <h4 class="card-title mb-4">
+                                            <i class="fas fa-cog text-primary me-2"></i>
+                                            Course Details
+                                        </h4>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <label for="category" class="form-label fw-bold">Category</label>
+                                                <select class="form-select form-select-lg" id="category" name="category" required>
+                                                    <option value="">Select Category</option>
+                                                    <option value="Programming">Programming</option>
+                                                    <option value="Design">Design</option>
+                                                    <option value="Business">Business</option>
+                                                    <option value="Marketing">Marketing</option>
+                                                    <option value="Data Science">Data Science</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6 mb-4">
+                                                <label for="level" class="form-label fw-bold">Level</label>
+                                                <select class="form-select form-select-lg" id="level" name="level" required>
+                                                    <option value="">Select Level</option>
+                                                    <option value="Beginner">Beginner</option>
+                                                    <option value="Intermediate">Intermediate</option>
+                                                    <option value="Advanced">Advanced</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <label for="price" class="form-label fw-bold">Price ($)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control form-control-lg" id="price" name="price" min="0" step="0.01" required placeholder="0.00">
+                                                </div>
+                                                <div class="form-text">Set to 0 for a free course</div>
+                                            </div>
+
+                                            <div class="col-md-6 mb-4">
+                                                <label for="duration" class="form-label fw-bold">Duration</label>
+                                                <input type="text" class="form-control form-control-lg" id="duration" name="duration" placeholder="e.g., 2 hours" required>
+                                                <div class="form-text">Estimated total course duration</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Course Content -->
+                                <div class="card mb-4 shadow-sm">
+                                    <div class="card-body">
+                                        <h4 class="card-title mb-4">
+                                            <i class="fas fa-book text-primary me-2"></i>
+                                            Course Content
+                                        </h4>
+                                        
+                                        <div class="mb-4">
+                                            <label for="requirements" class="form-label fw-bold">Requirements</label>
+                                            <textarea class="form-control" id="requirements" name="requirements" rows="3" placeholder="List the prerequisites for your course (comma-separated)"></textarea>
+                                            <div class="form-text">What should students know before taking this course?</div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label for="whatYouWillLearn" class="form-label fw-bold">What You Will Learn</label>
+                                            <textarea class="form-control" id="whatYouWillLearn" name="whatYouWillLearn" rows="3" required placeholder="List the key learning outcomes (comma-separated)"></textarea>
+                                            <div class="form-text">What skills and knowledge will students gain?</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <!-- Thumbnail Upload -->
+                                <div class="card mb-4 shadow-sm">
+                                    <div class="card-body">
+                                        <h4 class="card-title mb-4">
+                                            <i class="fas fa-image text-primary me-2"></i>
+                                            Course Thumbnail
+                                        </h4>
+                                        
+                                        <div class="mb-4">
+                                            <label for="thumbnail" class="form-label fw-bold">Upload Thumbnail</label>
+                                            <div class="thumbnail-upload-area p-4 border rounded text-center mb-3" id="thumbnail-drop-area">
+                                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                                <p class="mb-2">Drag and drop your image here</p>
+                                                <p class="text-muted small mb-0">or</p>
+                                                <input type="file" class="form-control mt-3" id="thumbnail" name="thumbnail" accept="image/*" required>
+                                                <div class="form-text mt-2">Recommended size: 1280x720 pixels</div>
+                                            </div>
+
+                                            <div id="thumbnail-preview" class="mt-3" style="display: none;">
+                                                <img src="" alt="Thumbnail Preview" class="img-fluid rounded shadow-sm">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                                            <i class="fas fa-save me-2"></i>
+                                            Create Course
+                                        </button>
+                                        <div class="form-text text-center mt-3">
+                                            You can edit your course details later
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper {
+    display: flex;
+    min-height: calc(100vh - 70px); /* Adjust based on header height */
+    margin-top: 70px; /* Adjust based on header height */
+}
+
+.main-content-wrapper {
+    flex: 1;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.create-course-header {
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    background: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    padding: 0.8rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+.thumbnail-upload-area {
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.thumbnail-upload-area:hover {
+    border-color: #4a90e2;
+    background-color: #f0f7ff;
+}
+
+.btn-primary {
+    padding: 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #4a90e2, #357abd);
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+    background: linear-gradient(45deg, #357abd, #4a90e2);
+}
+
+.form-label {
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+#thumbnail-preview img {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    color: #6c757d;
+}
+
+@media (max-width: 991.98px) {
+    .page-wrapper {
+        flex-direction: column;
+    }
+    
+    .main-content-wrapper {
+        margin-left: 0;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Thumbnail preview
+    const thumbnailInput = document.getElementById('thumbnail');
+    const preview = document.getElementById('thumbnail-preview');
+    const dropArea = document.getElementById('thumbnail-drop-area');
+
+    thumbnailInput.addEventListener('change', function(e) {
+        handleFile(e.target.files[0]);
+    });
+
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        dropArea.classList.add('border-primary');
+    }
+
+    function unhighlight(e) {
+        dropArea.classList.remove('border-primary');
+    }
+
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFile(files[0]);
+    }
+
+    function handleFile(file) {
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.querySelector('img').src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Form validation
+    const form = document.querySelector('.create-course-form');
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+
+<%- include('partials/footer') %> 

@@ -1,0 +1,208 @@
+{
+  "platform_stats": {
+    "total_courses": 10500,
+    "total_students": 20500,
+    "total_teachers": 2500,
+    "job_placement_rate": 100
+  },
+  "courses": [
+    {
+      "id": 1,
+      "isPublished": true,
+      "title": "Complete HTML Tutorial",
+      "instructor": "John Doe",
+      "date": "2025-04-19",
+      "thumbnail": "images/thumb-1.png",
+      "instructor_img": "images/pic-2.jpg",
+      "category": "Web Development",
+      "duration": "8 hours",
+      "level": "Beginner",
+      "students": 1250,
+      "description": "Learn HTML from scratch with this comprehensive tutorial covering all the essential concepts and techniques.",
+      "videos": [
+        {
+          "title": "Complete HTML Tutorial (Part 01)",
+          "thumbnail": "images/pic-4.jpg",
+          "duration": "45:22"
+        },
+        {
+          "title": "Complete HTML Tutorial (Part 02)",
+          "thumbnail": "images/pic-5.jpg",
+          "duration": "52:10"
+        },
+        {
+          "title": "Complete HTML Tutorial (Part 03)",
+          "thumbnail": "images/pic-8.jpg",
+          "duration": "38:45"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "isPublished": true,
+      "title": "Complete CSS Tutorial",
+      "instructor": "John Doe",
+      "date": "2025-04-19",
+      "thumbnail": "images/thumb-2.png",
+      "instructor_img": "images/pic-3.jpg",
+      "category": "Web Development",
+      "duration": "10 hours",
+      "level": "Beginner",
+      "students": 980,
+      "description": "Master CSS with this in-depth tutorial covering selectors, layouts, animations and responsive design.",
+      "videos": [
+        {
+          "title": "CSS Fundamentals",
+          "thumbnail": "images/pic-6.jpg",
+          "duration": "50:15"
+        },
+        {
+          "title": "Flexbox and Grid",
+          "thumbnail": "images/pic-7.jpg",
+          "duration": "65:30"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "isPublished": true,
+      "title": "Complete JavaScript Tutorial",
+      "instructor": "John Doe",
+      "date": "2025-04-19",
+      "thumbnail": "images/thumb-3.png",
+      "instructor_img": "images/pic-4.jpg",
+      "category": "Web Development",
+      "duration": "15 hours",
+      "level": "Intermediate",
+      "students": 1870,
+      "description": "From basics to advanced concepts, learn JavaScript thoroughly with practical examples.",
+      "videos": [
+        {
+          "title": "JavaScript Basics",
+          "thumbnail": "images/pic-2.jpg",
+          "duration": "55:10"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "name": "Development",
+      "icon": "fas fa-code",
+      "popular_topics": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React",
+        "Node.js"
+      ]
+    },
+    {
+      "name": "Business",
+      "icon": "fas fa-chart-simple",
+      "popular_topics": [
+        "Finance",
+        "Management",
+        "Marketing"
+      ]
+    },
+    {
+      "name": "Design",
+      "icon": "fas fa-pen",
+      "popular_topics": [
+        "UI/UX",
+        "Graphic Design",
+        "Figma"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Ahmed",
+      "email": "ahmed@example.com",
+      "password": "hashed_password_123",
+      "role": "student",
+      "profilePicture": "uploads/1749496466845-pic-1.jpg",
+      "joined": "2024-01-15",
+      "likedVideos": 55
+    },
+    {
+      "id": 2,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "password": "hashed_password_456",
+      "role": "teacher",
+      "profilePicture": "uploads/1749496466845-pic-1.jpg",
+      "joined": "2023-11-20",
+      "courses_created": 12,
+      "students": 3200,
+      "rating": 4.8
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "user": {
+        "name": "John Deo",
+        "image": "images/pic-2.jpg"
+      },
+      "rating": 4.5,
+      "comment": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt, hic velit unde a adipisci id dolor officiis dignissimos aut tempore.",
+      "date": "2025-03-15"
+    },
+    {
+      "id": 2,
+      "user": {
+        "name": "John Deo",
+        "image": "images/pic-3.jpg"
+      },
+      "rating": 5,
+      "comment": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt, hic velit unde a adipisci id dolor officiis dignissimos aut tempore.",
+      "date": "2025-04-02"
+    },
+    {
+      "id": 3,
+      "user": {
+        "name": "John Deo",
+        "image": "images/pic-4.jpg"
+      },
+      "rating": 4,
+      "comment": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt, hic velit unde a adipisci id dolor officiis dignissimos aut tempore.",
+      "date": "2025-04-10"
+    }
+  ],
+  "teachers": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "image": "images/pic-2.jpg",
+      "profession": "Web Developer",
+      "courses": 12,
+      "students": 3200,
+      "rating": 4.8,
+      "bio": "Professional web developer with 10+ years of experience teaching modern web technologies."
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "image": "images/pic-3.jpg",
+      "profession": "UI/UX Designer",
+      "courses": 8,
+      "students": 1800,
+      "rating": 4.9,
+      "bio": "Award-winning designer teaching the principles of beautiful and functional design."
+    }
+  ],
+  "contact_info": {
+    "phone_numbers": [
+      "123-456-7890",
+      "111-222-3333"
+    ],
+    "emails": [
+      "shaikhanas@gmail.com",
+      "anasbhai@gmail.com"
+    ],
+    "address": "Flat no. 1, A-1 building, Jogeshwari, Mumbai, India - 400104"
+  }
+}

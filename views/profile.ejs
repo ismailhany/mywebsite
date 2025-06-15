@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education - Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<div class="page-content">
+    <section class="profile">
+        <h1 class="heading">Profile Details</h1>
+        <div class="details">
+            <div class="user">
+                <img src="<%= user.profilePicture%>" alt="profile picture" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid #eee;">
+                <h3><%= user.fullName %></h3>
+                <p><%= user.role %></p>
+                <a href="/update" class="inline-btn">update profile</a>
+            </div>
+
+            <div class="box-container">
+                <div class="box" style="margin-top: 15px;">
+                    <i class="fas fa-heart"></i>
+                    <div>
+                        <span><%= user.enrolledCoursesCount %></span>
+                        <a href="/dashboard" class="inline-btn">Enrolled Courses</a>
+                    </div>
+                    
+                </div>
+
+                <div class="box" style="margin-top: 15px;">
+                    <i class="fas fa-comment"></i>
+                    <div>
+                        <span><%= user.likedVideos %></span>
+                        <a href="#" class="inline-btn">Liked Videos</a>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <% if (user) { %>
+            <button id="liked-courses-btn" class="btn btn-primary" style="margin-bottom:1rem;">View Liked Courses</button>
+        <% } %>
+    </section>
+</div>
+<%- include('partials/footer') %>
+<script src="/script.js"></script>
+<script>
+document.getElementById('liked-courses-btn')?.addEventListener('click', function() {
+    var liked = JSON.parse(localStorage.getItem('likedCourses') || '[]');
+    if (liked.length > 0) {
+        window.location.href = '/liked-courses?ids=' + liked.join(',');
+    } else {
+        alert('You have not liked any courses yet.');
+    }
+});
+</script>
+</body>
+</html>

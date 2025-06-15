@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education - About Us</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<div class="page-content">
+    <section class="about">
+        <div class="row">
+            <h3 style="margin-top: 20px;text-align: center;">About LearnHub</h3>
+            <div class="image">
+                <img src="/images/about-img.svg" alt="about illustration"
+                    style="width: 30%;height: 30%;display: block;margin: auto;">
+            </div>
+            <div class="content">
+                <h3>why choose us?</h3>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab quibusdam officia magni ea dolorum
+                    repellat assumenda dignissimos ipsum magnam unde!</p>
+                <a href="/courses" class="inline-btn">our courses</a>
+            </div>
+        </div>
+
+        <div class="box-container">
+            <div class="box">
+                <i class="fas fa-graduation-cap"></i>
+                <div>
+                    <h3>+10k</h3>
+                    <span>online courses</span>
+                </div>
+            </div>
+
+            <div class="box">
+                <i class="fas fa-user-graduate"></i>
+                <div>
+                    <h3>+20k</h3>
+                    <span>brilliant student</span>
+                </div>
+            </div>
+
+            <div class="box">
+                <i class="fas fa-chalkboard-user"></i>
+                <div>
+                    <h3>+2k</h3>
+                    <span>expert teachers</span>
+                </div>
+            </div>
+
+            <div class="box">
+                <i class="fas fa-briefcase"></i>
+                <div>
+                    <h3>100%</h3>
+                    <span>job placement</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="reviews">
+        <h1 class="heading">students reviews</h1>
+        <div class="box-container">
+            <div class="box">
+                <p>"This platform made learning so easy and fun! The teachers are very supportive and the content is top-notch."</p>
+                <div class="user">
+                    <img src="/images/pic-2.jpg" alt="student review">
+                    <div>
+                        <h3>Sarah Ahmed</h3>
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box">
+                <p>"I improved my skills and landed a new job thanks to the amazing courses and instructors here!"</p>
+                <div class="user">
+                    <img src="/images/pic-3.jpg" alt="student review">
+                    <div>
+                        <h3>Mohamed Ali</h3>
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box">
+                <p>"Great experience! The lessons are clear and the community is very helpful. Highly recommended."</p>
+                <div class="user">
+                    <img src="/images/pic-4.jpg" alt="student review">
+                    <div>
+                        <h3>Lina Hassan</h3>
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<%- include('partials/footer') %>
+<script src="/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+<div class="page-content">
+    <section class="help-center" style="max-width: 800px; margin: auto;">
+        <h1 class="heading">Help Center</h1>
+        <form class="form-group" style="margin-bottom: 2rem;">
+            <div class="input-group">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search help topics..." style="width: 100%;">
+            </div>
+        </form>
+        <div class="faq-section" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <h4>How do I enroll in a course?</h4>
+                    <p>Go to the Courses page, select a course, and click the "Enroll" button.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>How do I reset my password?</h4>
+                    <p>Go to the Login page and click "Forgot Password" to receive a reset link.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>How can I contact my instructor?</h4>
+                    <p>Visit the course page and use the messaging feature or find the instructor's contact info on their profile.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>How do I become a teacher?</h4>
+                    <p>Click "Become a Tutor" on the Teachers page and follow the registration process.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Where can I find my certificates?</h4>
+                    <p>Your certificates are available in your Profile under the "Certificates" section after completing a course.</p>
+                </div>
+            </div>
+        </div>
+        <div class="contact-support" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">Still need help?</h2>
+            <form action="/contact" method="get">
+                <button type="submit" class="btn btn-primary">Contact Support</button>
+            </form>
+        </div>
+    </section>
+</div>
+<%- include('partials/footer') %>
+<script src="/script.js"></script>
+</body>
+</html> 
